@@ -11,7 +11,7 @@ const Dashboard = () => {
       <Sidebar />
 
       <main className="flex-1 p-6">
-        {location.pathname !== "/courses" && (
+        {location.pathname == "/" && (
           <>
             <h1 className="text-2xl text-white font-bold">Dashboard</h1>
             <p className="text-gray-400 mb-6">

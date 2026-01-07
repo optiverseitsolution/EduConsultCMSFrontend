@@ -2,7 +2,7 @@
 
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard.jsx";
-import Courses from "./components/Courses.jsx";
+import Courses from "./pages/Courses.jsx";
 
 function App() {
   return (
