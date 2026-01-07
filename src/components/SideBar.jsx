@@ -10,9 +10,16 @@ const Sidebar = () => {
           <FaHome /> Dashboard
         </button>
 
-        <button className="sidebar-btn"><FaUserGraduate /> Students</button>
-        <button className="sidebar-btn"><FaBook /> Courses</button>
-        <button className="sidebar-btn"><FaUniversity /> Universities</button>
+        <button className="sidebar-btn">
+          <FaUserGraduate /> Students
+        </button>
+        <button className="sidebar-btn">
+          <FaBook /> Courses
+        </button>
+        <button className="sidebar-btn">
+          <FaUniversity /> Universities
+        </button>
+        <button className="sidebar-btn">Courses</button>
       </nav>
 
       <div className="absolute bottom-4 text-sm text-gray-400">
