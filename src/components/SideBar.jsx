@@ -10,29 +10,22 @@ import {
   User2,
   UserCog,
 } from "lucide-react";
-
 import { FaMoon, FaSun } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
-  const navigate = useNavigate();
-
+  // for new components added please add the path directly here as well as in App.jsx
   const navItems = [
     { id: "dashboard", label: "Dashboard", path: "/", icon: LayoutDashboard },
-    { id: "users-roles", label: "Users & Roles", path: "", icon: Shield },
-    { id: "students", label: "Students", path: "", icon: GraduationCap },
-    { id: "courses", label: "Courses", path: "courses", icon: BookOpen },
-    {
-      id: "universities",
-      label: "Universities",
-      path: "universities",
-      icon: Building2,
-    },
-    { id: "counselors", label: "Counselors", path: "", icon: UserCog },
-    { id: "consultancy", label: "Consultancy", path: "", icon: Briefcase },
-    { id: "fees", label: "Fee Structure", path: "", icon: DollarSign },
+    { id: "users-roles", label: "Users & Roles", path: "/", icon: Shield },
+    { id: "students", label: "Students", path: "/", icon: GraduationCap },
+    { id: "courses", label: "Courses", path: "/courses", icon: BookOpen },
+    { id: "universities", label: "Universities", path: "/universities", icon: Building2 },
+    { id: "counselors", label: "Counselors", path: "/Counselor", icon: UserCog },
+    { id: "consultancy", label: "Consultancy", path: "/", icon: Briefcase },
+    { id: "fees", label: "Fee Structure", path: "/", icon: DollarSign },
   ];
+
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
   useEffect(() => {
@@ -40,12 +33,17 @@ const Sidebar = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  const linkClass = ({ isActive }) =>
+    `btn btn-block md:justify-start justify-center gap-3 ${
+      isActive ? "bg-blue-600 text-white" : "btn-ghost"
+    }`;
+
   return (
     <aside className="w-16 md:w-64 min-h-screen border-r border-gray-700 flex flex-col justify-between">
       {/* Header */}
-      <div className="">
+      <div>
         <div className="flex items-center justify-center md:justify-around border-b border-gray-700 py-4 px-4">
-          <div className="p-2 bg-blue-600 rounded-lg">
+          <div className="p-2 bg-blue-600 rounded-lg text-white">
             <GraduationCap size={32} />
           </div>
           <h1 className="hidden md:flex text-xl font-bold items-center justify-center text-center">
@@ -55,87 +53,36 @@ const Sidebar = () => {
 
         {/* Navigation */}
         <nav className="space-y-1 my-5 p-1">
-          {/* <button className="btn bg-blue-600 btn-block md:justify-start justify-center gap-3">
-            <LayoutDashboard />
-            <span className="hidden md:inline">Dashboard</span>
-          </button> */}
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `btn btn-block md:justify-start justify-center gap-3 ${
-                isActive ? "bg-blue-600" : "btn-ghost"
-              }`
-            }
-          >
-            <GraduationCap />
-            <span className="hidden md:inline">Dashboard</span>
-          </NavLink>
-
-          
-
-          <button className="btn btn-ghost btn-block md:justify-start justify-center gap-3">
-            <GraduationCap />
-            <span className="hidden md:inline">Students</span>
-          </button>
-
-          <button className="btn btn-ghost btn-block md:justify-start justify-center gap-3">
-            <BookOpen />
-            <span className="hidden md:inline">Courses</span>
-          </button>
-
-          <button className="btn btn-ghost btn-block md:justify-start justify-center gap-3">
-            <Building2 />
-            <span className="hidden md:inline">Universities</span>
-          </button>
-
-          <NavLink
-            to="/Counselor"
-            className={({ isActive }) =>
-              `btn btn-block md:justify-start justify-center gap-3 ${
-                isActive ? "bg-blue-600" : "btn-ghost"
-              }`
-            }
-          >
-            <UserCog />
-            <span className="hidden md:inline">Counselors</span>
-          </NavLink>
-
-          <button className="btn btn-ghost btn-block md:justify-start justify-center gap-3">
-            <Briefcase />
-            <span className="hidden md:inline">Consultancy</span>
-          </button>
-
-          <button className="btn btn-ghost btn-block md:justify-start justify-center gap-3">
-            <DollarSign />
-            <span className="hidden md:inline">Dollar</span>
-          </button>
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink key={item.id} to={item.path} className={linkClass} end={item.path === "/"}>
+                <Icon />
+                <span className="hidden md:inline">{item.label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
       </div>
 
       {/* Footer */}
       <div className="space-y-4">
         {/* Theme Toggle */}
-        <label className="swap swap-rotate self-center md:self-start">
+        <label className="swap swap-rotate self-center md:self-start px-3">
           <input
             type="checkbox"
             checked={theme === "dark"}
-            onChange={() =>
-              setTheme(theme === "light" ? "dark" : "light")
-            }
+            onChange={() => setTheme(theme === "light" ? "dark" : "light")}
           />
-
           <FaSun className="swap-off text-xl" />
           <FaMoon className="swap-on text-xl" />
         </label>
 
         {/* User Info */}
         <div className="flex items-center justify-center md:justify-start gap-3 p-3 border-t border-gray-700 bg-base-200/50">
-          {/* Avatar / Icon */}
           <div className="p-2 rounded-full bg-primary/10 text-primary">
             <User2 size={18} />
           </div>
-
-          {/* User Details */}
           <div className="leading-tight hidden md:block">
             <p className="text-sm font-medium">Admin User</p>
             <p className="text-xs opacity-60">admin@educonsult.com</p>
