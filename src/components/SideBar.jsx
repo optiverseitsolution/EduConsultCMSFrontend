@@ -16,6 +16,23 @@ import { useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
+  const navItems = [
+    { id: "dashboard", label: "Dashboard", path: "/", icon: LayoutDashboard },
+    { id: "users-roles", label: "Users & Roles", path: "", icon: Shield },
+    { id: "students", label: "Students", path: "", icon: GraduationCap },
+    { id: "courses", label: "Courses", path: "courses", icon: BookOpen },
+    {
+      id: "universities",
+      label: "Universities",
+      path: "universities",
+      icon: Building2,
+    },
+    { id: "counselors", label: "Counselors", path: "", icon: UserCog },
+    { id: "consultancy", label: "Consultancy", path: "", icon: Briefcase },
+    { id: "fees", label: "Fee Structure", path: "", icon: DollarSign },
+  ];
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
   useEffect(() => {
