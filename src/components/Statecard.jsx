@@ -1,9 +1,23 @@
 const StatCard = ({ title, value, change }) => {
+  const isPositive = change?.startsWith("+");
+
   return (
-    <div className="bg-[#121821] p-5 rounded-xl shadow">
-      <p className="text-sm text-gray-400">{title}</p>
-      <h2 className="text-2xl font-bold text-white mt-2">{value}</h2>
-      <p className="text-green-500 text-sm mt-1">{change}</p>
+    <div className="card bg-base-200 shadow-sm">
+      <div className="card-body p-5">
+        <p className="text-sm opacity-70">{title}</p>
+
+        <h2 className="text-2xl font-bold">
+          {value}
+        </h2>
+
+        <p
+          className={`text-sm font-medium ${
+            isPositive ? "text-success" : "text-error"
+          }`}
+        >
+          {change}
+        </p>
+      </div>
     </div>
   );
 };
