@@ -7,7 +7,7 @@ import { Outlet, useLocation } from "react-router-dom";
 const Dashboard = () => {
   const location = useLocation();
   return (
-    <div className="flex bg-black min-h-screen">
+    <div className="flex  min-h-screen">
       <Sidebar />
 
       <main className="flex-1 p-6">
