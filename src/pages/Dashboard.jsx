@@ -5,7 +5,7 @@ import TopUniversities from "../components/TopUniversities.jsx";
 
 const Dashboard = () => {
   return (
-    <div className="flex bg-black min-h-screen">
+    <div className="flex  min-h-screen">
       <Sidebar />
 
       <main className="flex-1 p-6">
