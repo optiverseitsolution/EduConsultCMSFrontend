@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
+import MobileCard from "../components/MobileCard";
 
 const Courses = () => {
   const [courses, setCourses] = useState([
@@ -56,42 +57,37 @@ const Courses = () => {
   ];
 
   return (
-    <div className="flex bg-black min-h-screen">
-      <div className="flex-1 p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl text-white font-bold">
-              Courses / Programs
-            </h1>
-            <p className="text-gray-400">
-              Manage course offerings and programs
-            </p>
-          </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium">
-            + Add Course
-          </button>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl text-white font-bold">Courses / Programs</h1>
+          <p className="text-gray-400">Manage course offerings and programs</p>
         </div>
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
+          + Add Course
+        </button>
+      </div>
 
-        {/* All Courses Section */}
-        <div className="bg-[#0B0F14] rounded-lg p-6">
-          <h2 className="text-lg text-white font-semibold mb-4">All Courses</h2>
-          <p className="text-gray-400 text-sm mb-4">
-            Browse and manage available courses and programs
-          </p>
-          {/* Search Bar */}
-          <div className="mb-6">
-            <div className="relative">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      <div className="bg-[#0B0F14] rounded-lg p-4 sm:p-6">
+        <h2 className="text-lg text-white font-semibold mb-2">All Courses</h2>
+        <p className="text-gray-400 text-sm mb-4">
+          Browse and manage available courses and programs
+        </p>
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
-              <input
-                type="text"
-                placeholder="Search courses..."
-                className="w-full text-white pl-10 pr-2 py-2 rounded-lg 
-               border border-gray-700 focus:outline-none focus:border-blue-500"
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Search courses..."
+              className="w-full bg-[#0B0F14] text-white pl-10 pr-2 py-2 rounded-lg 
+border border-gray-700 focus:outline-none focus:border-blue-500"
+            />
           </div>
-          {/* Table */}
+        </div>
+        {/* Table */}
+        <div className="overflow-x-auto">
           <Table
             headers={headers}
             data={courses}
@@ -100,21 +96,37 @@ const Courses = () => {
                 key={course.id}
                 className="border-b border-gray-700 hover:bg-gray-800"
               >
-                <td className="px-4 py-4">{course.name}</td>
-                <td className="px-4 py-4">{course.level}</td>
-                <td className="px-4 py-4">{course.field}</td>
-                <td className="px-4 py-4">{course.duration}</td>
-                <td className="px-4 py-4">{course.intake}</td>
-                <td className="px-4 py-4">{course.country}</td>
-                <td className="px-4 py-4">{course.university}</td>
-                <td className="px-4 py-4">{course.tuitionFee}</td>
-                <td className="px-4 py-4">
+                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                  {course.name}
+                </td>
+                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                  {course.level}
+                </td>
+                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                  {course.field}
+                </td>
+                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                  {course.duration}
+                </td>
+                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                  {course.intake}
+                </td>
+                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                  {course.country}
+                </td>
+                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                  {course.university}
+                </td>
+                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                  {course.tuitionFee}
+                </td>
+                <td className="px-2 sm:px-4 py-4">
                   <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs">
                     {course.status}
                   </span>
                 </td>
-                <td className="px-4 py-4">
-                  <div className="flex gap-4">
+                <td className="px-2 sm:px-4 py-4">
+                  <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
                     <button className="hover:text-blue-300">View</button>
                     <button className="hover:text-blue-300">Edit</button>
                     <button className="hover:text-red-300">Delete</button>
@@ -123,6 +135,40 @@ const Courses = () => {
               </tr>
             )}
           />
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {courses.map((course) => (
+              <MobileCard
+                key={course.id}
+                title={course.name}
+                fields={[
+                  { label: "Level", value: course.level },
+                  { label: "Field", value: course.field },
+                  { label: "Duration", value: course.duration },
+                  { label: "Country", value: course.country },
+                  { label: "University", value: course.university },
+                  { label: "Fee", value: course.tuitionFee },
+                ]}
+                actions={[
+                  {
+                    label: "View",
+                    className: "text-blue-400 text-sm",
+                    onClick: () => console.log("View", course),
+                  },
+                  {
+                    label: "Edit",
+                    className: "text-blue-400 text-sm",
+                    onClick: () => console.log("Edit", course),
+                  },
+                  {
+                    label: "Delete",
+                    className: "text-red-400 text-sm",
+                    onClick: () => console.log("Delete", course),
+                  },
+                ]}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
