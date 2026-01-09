@@ -9,28 +9,30 @@ const counselors = [
 
 const Counselors = () => {
   return (
-    <div className="flex min-h-screen ">
+    <div className="flex min-h-screen">
+      {/* Sidebar stays LEFT on all screens */}
       <Sidebar />
 
-      <main className="flex-1 p-8">
+      {/* Main content */}
+      <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
         {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold ">Counselors</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">Counselors</h1>
             <p className="text-gray-400 text-sm mt-1">
               Manage counselor assignments and availability
             </p>
           </div>
 
-          <button className="btn btn-primary bg-[#1d4ed8] hover:bg-blue-700 border-none  normal-case rounded-lg px-6">
+          <button className="btn btn-primary bg-[#1d4ed8] hover:bg-blue-700 border-none normal-case rounded-lg px-6 w-full sm:w-auto flex items-center justify-center">
             <Plus size={18} className="mr-1" /> Add Counselor
           </button>
         </div>
 
         {/* Main Content Card */}
-        <div className=" rounded-xl border border-gray-700 p-8">
+        <div className="rounded-xl border border-gray-700 p-4 sm:p-6 lg:p-8">
           <div className="mb-6">
-            <h2 className="text-xl font-semibold ">All Counselors</h2>
+            <h2 className="text-lg sm:text-xl font-semibold">All Counselors</h2>
             <p className="text-gray-400 text-sm">
               View and manage all counselors and their assignments
             </p>
@@ -40,7 +42,7 @@ const Counselors = () => {
           <div className="relative mb-8">
             <Search
               size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 "
+              className="absolute left-4 top-1/2 -translate-y-1/2"
             />
             <input
               type="text"
@@ -51,8 +53,8 @@ const Counselors = () => {
 
           {/* Table */}
           <div className="overflow-x-auto">
-            <table className="table w-full border-none">
-              <thead className=" border-none">
+            <table className="table w-full border-none min-w-[900px]">
+              <thead className="border-none">
                 <tr className="border-none text-[13px] uppercase tracking-wider">
                   <th className="bg-transparent pl-0 font-medium">S.N.</th>
                   <th className="bg-transparent font-medium">Counselor</th>
@@ -62,25 +64,31 @@ const Counselors = () => {
                   <th className="bg-transparent text-right pr-0 font-medium">Actions</th>
                 </tr>
               </thead>
+
               <tbody className="text-sm">
                 {counselors.map((c, index) => (
-                  <tr key={c.id} className="border-none hover:bg-white/5 transition-colors group">
-                    <td className="pl-0 ">{index + 1}</td>
+                  <tr
+                    key={c.id}
+                    className="border-none hover:bg-white/5 transition-colors group"
+                  >
+                    <td className="pl-0">{index + 1}</td>
 
                     <td className="py-4">
                       <div className="flex items-center gap-3">
                         <div className="avatar">
-                          <div className="w-9 rounded-full ">
-                             {/* Placeholder for the person icon shown in your image */}
-                            <img src={`https://ui-avatars.com/api/?name=${c.name}&background=fdba74&color=7c2d12`} alt="avatar" />
+                          <div className="w-9 rounded-full">
+                            <img
+                              src={`https://ui-avatars.com/api/?name=${c.name}&background=fdba74&color=7c2d12`}
+                              alt="avatar"
+                            />
                           </div>
                         </div>
-                        <span className="font-semibold ">{c.name}</span>
+                        <span className="font-semibold">{c.name}</span>
                       </div>
                     </td>
 
-                    <td className="">{c.email}</td>
-                    <td className="text-center ">{c.countries}</td>
+                    <td>{c.email}</td>
+                    <td className="text-center">{c.countries}</td>
 
                     <td className="text-center">
                       <span
@@ -95,10 +103,10 @@ const Counselors = () => {
                     </td>
 
                     <td className="text-right pr-0">
-                      <div className="flex items-center justify-start gap-5">
-                        <button className="   font-medium">View</button>
-                        <button className="   font-medium">Edit</button>
-                        <button className="   font-medium">Delete</button>
+                      <div className="flex flex-wrap items-center justify-start gap-3 sm:gap-5">
+                        <button className="font-medium">View</button>
+                        <button className="font-medium">Edit</button>
+                        <button className="font-medium">Delete</button>
                       </div>
                     </td>
                   </tr>

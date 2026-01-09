@@ -7,28 +7,30 @@ const applications = [
 
 const RecentApplications = () => {
   return (
-    <div className="card bg-base-200 shadow-sm">
-      <div className="card-body p-5">
-        <h3 className="card-title text-base">
+    <div className="rounded-xl border border-gray-800 bg-base-200/60">
+      <div className="p-5 sm:p-6">
+        {/* Title */}
+        <h3 className="text-base font-semibold mb-4">
           Recent Applications
         </h3>
 
-        <ul className="space-y-4">
+        {/* List */}
+        <ul className="divide-y divide-gray-800">
           {applications.map((app, i) => (
             <li
               key={i}
-              className="flex items-center justify-between"
+              className="flex items-center justify-between py-3 gap-4"
             >
-              <div>
-                <p className="font-medium">
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate">
                   {app.name}
                 </p>
-                <p className="text-sm opacity-70">
+                <p className="text-xs text-gray-400 truncate">
                   Applied to {app.uni}
                 </p>
               </div>
 
-              <span className="badge badge-success  badge-outline">
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-900/40  border border-green-700 whitespace-nowrap">
                 {app.status}
               </span>
             </li>
