@@ -3,6 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import oxford from "../assets/logos/oxford.png";
 import MobileCard from "../components/MobileCard";
+import { Plus } from "lucide-react";
 
 const Universities = () => {
   const [universities, setUniversities] = useState([
@@ -64,8 +65,8 @@ const Universities = () => {
             Manage partner and non-partner institutions
           </p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
-          + Add University
+        <button className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
+          <Plus size={18} /> Add University
         </button>
       </div>
 

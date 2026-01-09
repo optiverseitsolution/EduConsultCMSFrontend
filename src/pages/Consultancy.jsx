@@ -2,57 +2,46 @@ import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
+import abc from "../assets/logos/abc.jpg";
 import { Plus } from "lucide-react";
 
-const Courses = () => {
-  const [courses, setCourses] = useState([
+const Consultancy = () => {
+  const [consultancies, setConsultancies] = useState([
     {
       id: 1,
-      name: "BSc Information Technology",
-      level: "Bachelor",
-      field: "IT",
-      duration: "3 Years",
-      intake: "Jan, Sep",
-      country: "Australia",
-      university: "Sydney University",
-      tuitionFee: "$15,000/year",
+      logo: abc,
+      name: "ABC Education Consultancy",
+      email: "contact@abcedu.com",
+      phone: "+1-234-567-8900",
+      country: "USA",
+      serviceFee: 500,
+      currency: "USD",
+    students: 245,
       status: "Active",
     },
     {
       id: 2,
-      name: "MSc Computer Science",
-      level: "Master",
-      field: "IT",
-      duration: "2 Years",
-      intake: "Feb, Sep",
+      logo: abc,
+      name: "Global Study Partners",
+      email: "info@globalstudy.com",
+      phone: "+44-20-1234-5678",
       country: "UK",
-      university: "Oxford University",
-      tuitionFee: "$25,000/year",
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "MBA Business Administration",
-      level: "Master",
-      field: "Business",
-      duration: "2 Years",
-      intake: "Sep",
-      country: "USA",
-      university: "Stanford University",
-      tuitionFee: "$45,000/year",
+      serviceFee: 400,
+      currency: "GBP",
+      students: 189,
       status: "Active",
     },
   ]);
 
   const headers = [
-    "Course Name",
-    "Level",
-    "Field",
-    "Duration",
-    "Intake",
+    "Logo",
+    "Consultancy Name",
+    "Email",
+    "Phone",
     "Country",
-    "University",
-    "Tuition Fee",
+    "Service Fee",
+    "Currency",
+    "Students",
     "Status",
     "Actions",
   ];
@@ -61,18 +50,22 @@ const Courses = () => {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl text-white font-bold">Courses / Programs</h1>
-          <p className="text-gray-400">Manage course offerings and programs</p>
+          <h1 className="text-2xl text-white font-bold">Consultancy</h1>
+          <p className="text-gray-400">
+            Manage consultancy information and services
+          </p>
         </div>
         <button className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
-          <Plus size={18} /> Add Course
+          <Plus size={18} /> Add Consultancy
         </button>
       </div>
 
       <div className="bg-[#0B0F14] rounded-lg p-4 sm:p-6">
-        <h2 className="text-lg text-white font-semibold mb-2">All Courses</h2>
+        <h2 className="text-lg text-white font-semibold mb-2">
+          All consultancies
+        </h2>
         <p className="text-gray-400 text-sm mb-4">
-          Browse and manage available courses and programs
+          View and manage consultancy partnerships
         </p>
         {/* Search Bar */}
         <div className="mb-6">
@@ -81,7 +74,7 @@ const Courses = () => {
 
             <input
               type="text"
-              placeholder="Search courses..."
+              placeholder="Search consultancies..."
               className="w-full bg-[#0B0F14] text-white pl-10 pr-2 py-2 rounded-lg 
 border border-gray-700 focus:outline-none focus:border-blue-500"
             />
@@ -91,39 +84,44 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
         <div className="overflow-x-auto">
           <Table
             headers={headers}
-            data={courses}
-            renderRow={(course) => (
+            data={consultancies}
+            renderRow={(c) => (
               <tr
-                key={course.id}
+                key={c.id}
                 className="border-b border-gray-700 hover:bg-gray-800"
               >
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.name}
+                <td className="px-2 sm:px-4 ">
+                  <img
+                    src={c.logo}
+                    alt={c.name}
+                    className="w-8 rounded-lg object-cover"
+                  />
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.level}
+                  {c.name}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.field}
+                  {c.email}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.duration}
+                  {c.phone}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.intake}
+                  {c.country}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.country}
+                  ${c.serviceFee}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.university}
+                  {c.currency}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.tuitionFee}
+                  {c.students}
                 </td>
+
                 <td className="px-2 sm:px-4 py-4">
                   <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs">
-                    {course.status}
+                    {c.status}
                   </span>
                 </td>
                 <td className="px-2 sm:px-4 py-4">
@@ -138,33 +136,35 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
           />
           {/* Mobile Cards */}
           <div className="md:hidden space-y-4">
-            {courses.map((course) => (
+            {consultancies.map((c) => (
               <MobileCard
-                key={course.id}
-                title={course.name}
+                key={c.id}
+                title={c.name}
+                image={c.logo}
                 fields={[
-                  { label: "Level", value: course.level },
-                  { label: "Field", value: course.field },
-                  { label: "Duration", value: course.duration },
-                  { label: "Country", value: course.country },
-                  { label: "University", value: course.university },
-                  { label: "Fee", value: course.tuitionFee },
+                  { label: "Email", value: c.level },
+                  { label: "Phone", value: c.phone },
+                  { label: "Country", value: c.country },
+                  { label: "Service Fee", value: `$${c.serviceFee}` },
+                  { label: "Currency", value: c.currency },
+                  { label: "Students", value: c.students },
+                  { label: "Status", value: c.status },
                 ]}
                 actions={[
                   {
                     label: "View",
                     className: "text-blue-400 text-sm",
-                    onClick: () => console.log("View", course),
+                    onClick: () => console.log("View", c),
                   },
                   {
                     label: "Edit",
                     className: "text-blue-400 text-sm",
-                    onClick: () => console.log("Edit", course),
+                    onClick: () => console.log("Edit", c),
                   },
                   {
                     label: "Delete",
                     className: "text-red-400 text-sm",
-                    onClick: () => console.log("Delete", course),
+                    onClick: () => console.log("Delete", c),
                   },
                 ]}
               />
@@ -176,4 +176,4 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
   );
 };
 
-export default Courses;
+export default Consultancy;

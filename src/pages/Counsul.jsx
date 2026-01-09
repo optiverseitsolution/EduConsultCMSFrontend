@@ -2,17 +2,33 @@ import { Plus, Search } from "lucide-react";
 import Sidebar from "../components/SideBar";
 
 const counselors = [
-  { id: 1, name: "John Doe", email: "john.counselor@example.com", countries: "UK, USA", status: "Available" },
-  { id: 2, name: "Jane Smith", email: "jane.counselor@example.com", countries: "Australia, Canada", status: "Busy" },
-  { id: 3, name: "Mike Johnson", email: "mike.counselor@example.com", countries: "Japan, South Korea", status: "Available" },
+  {
+    id: 1,
+    name: "John Doe",
+    email: "john.counselor@example.com",
+    countries: "UK, USA",
+    status: "Available",
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    email: "jane.counselor@example.com",
+    countries: "Australia, Canada",
+    status: "Busy",
+  },
+  {
+    id: 3,
+    name: "Mike Johnson",
+    email: "mike.counselor@example.com",
+    countries: "Japan, South Korea",
+    status: "Available",
+  },
 ];
 
 const Counselors = () => {
   return (
     <div className="flex min-h-screen ">
-      <Sidebar />
-
-      <main className="flex-1 p-8">
+      <main className="flex-1">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -57,22 +73,34 @@ const Counselors = () => {
                   <th className="bg-transparent pl-0 font-medium">S.N.</th>
                   <th className="bg-transparent font-medium">Counselor</th>
                   <th className="bg-transparent font-medium">Email</th>
-                  <th className="bg-transparent font-medium text-center">Counseling Country</th>
-                  <th className="bg-transparent font-medium text-center">Status</th>
-                  <th className="bg-transparent text-right pr-0 font-medium">Actions</th>
+                  <th className="bg-transparent font-medium text-center">
+                    Counseling Country
+                  </th>
+                  <th className="bg-transparent font-medium text-center">
+                    Status
+                  </th>
+                  <th className="bg-transparent text-right pr-0 font-medium">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="text-sm">
                 {counselors.map((c, index) => (
-                  <tr key={c.id} className="border-none hover:bg-white/5 transition-colors group">
+                  <tr
+                    key={c.id}
+                    className="border-none hover:bg-white/5 transition-colors group"
+                  >
                     <td className="pl-0 ">{index + 1}</td>
 
                     <td className="py-4">
                       <div className="flex items-center gap-3">
                         <div className="avatar">
                           <div className="w-9 rounded-full ">
-                             {/* Placeholder for the person icon shown in your image */}
-                            <img src={`https://ui-avatars.com/api/?name=${c.name}&background=fdba74&color=7c2d12`} alt="avatar" />
+                            {/* Placeholder for the person icon shown in your image */}
+                            <img
+                              src={`https://ui-avatars.com/api/?name=${c.name}&background=fdba74&color=7c2d12`}
+                              alt="avatar"
+                            />
                           </div>
                         </div>
                         <span className="font-semibold ">{c.name}</span>

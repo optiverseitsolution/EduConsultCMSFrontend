@@ -13,7 +13,7 @@ const Dashboard = () => {
     <div className="flex  min-h-screen">
       <Sidebar />
 
-      <main className="flex-1 p-6 bg-black">
+      <main className="flex-1 p-6 bg-black max-sm:p-4">
         {isDashboardHome ? (
           <>
             <h1 className="text-2xl text-white font-bold">Dashboard</h1>

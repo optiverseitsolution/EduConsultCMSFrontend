@@ -2,7 +2,7 @@ import React from "react";
 
 const MobileCard = ({ title, image, fields = [], actions = [] }) => {
   return (
-    <div className="bg-gray-900 rounded-lg p-4 text-white">
+    <div className="bg-gray-900 rounded-lg p-2 text-white">
       <div className="flex items-center gap-3 justify-between border-b border-gray-700">
         <div className="flex gap-4 items-center mb-2">
           {image && (
@@ -12,7 +12,7 @@ const MobileCard = ({ title, image, fields = [], actions = [] }) => {
               className="w-10 h-10 rounded-lg object-cover"
             />
           )}
-          <h3 className="font-semibold text-lg">{title}</h3>
+          <h3 className="font-semibold text-md">{title}</h3>
         </div>
         {actions.length > 0 && (
           <div className="flex gap-4">

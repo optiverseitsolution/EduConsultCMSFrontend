@@ -19,11 +19,21 @@ const Sidebar = () => {
     { id: "dashboard", label: "Dashboard", path: "/", icon: LayoutDashboard },
     { id: "users-roles", label: "Users & Roles", path: "/", icon: Shield },
     { id: "students", label: "Students", path: "/", icon: GraduationCap },
-    { id: "courses", label: "Courses", path: "/courses", icon: BookOpen },
-    { id: "universities", label: "Universities", path: "/universities", icon: Building2 },
-    { id: "counselors", label: "Counselors", path: "/Counselor", icon: UserCog },
-    { id: "consultancy", label: "Consultancy", path: "/", icon: Briefcase },
-    { id: "fees", label: "Fee Structure", path: "/", icon: DollarSign },
+    { id: "courses", label: "Courses", path: "courses", icon: BookOpen },
+    {
+      id: "universities",
+      label: "Universities",
+      path: "universities",
+      icon: Building2,
+    },
+    { id: "counselors", label: "Counselors", path: "counselor", icon: UserCog },
+    {
+      id: "consultancy",
+      label: "Consultancy",
+      path: "consultancy",
+      icon: Briefcase,
+    },
+    { id: "fees", label: "Fee Structure", path: "fee", icon: DollarSign },
   ];
 
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -56,7 +66,12 @@ const Sidebar = () => {
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
-              <NavLink key={item.id} to={item.path} className={linkClass} end={item.path === "/"}>
+              <NavLink
+                key={item.id}
+                to={item.path}
+                className={linkClass}
+                end={item.path === "/"}
+              >
                 <Icon />
                 <span className="hidden md:inline">{item.label}</span>
               </NavLink>
