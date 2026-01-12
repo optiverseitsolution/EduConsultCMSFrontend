@@ -58,9 +58,7 @@ const Universities = () => {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl text-white font-bold">
-            Universities / Programs
-          </h1>
+          <h1 className="text-2xl font-bold">Universities / Programs</h1>
           <p className="text-gray-400">
             Manage partner and non-partner institutions
           </p>
@@ -70,10 +68,8 @@ const Universities = () => {
         </button>
       </div>
 
-      <div className="bg-[#0B0F14] rounded-lg p-4 sm:p-6">
-        <h2 className="text-lg text-white font-semibold mb-2">
-          All Universities
-        </h2>
+      <div className="rounded-lg p-4 sm:p-6 border border-gray-400">
+        <h2 className="text-lg font-semibold mb-2">All Universities</h2>
         <p className="text-gray-400 text-sm mb-4">
           View and manage university partnerships
         </p>
@@ -85,7 +81,7 @@ const Universities = () => {
             <input
               type="text"
               placeholder="Search universities..."
-              className="w-full bg-[#0B0F14] text-white pl-10 pr-2 py-2 rounded-lg 
+              className="w-full pl-10 pr-2 py-2 rounded-lg 
 border border-gray-700 focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -118,11 +114,11 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                 </td>
                 <td className="px-2 sm:px-4 py-4">
                   {university.partnerType === "Partner" ? (
-                    <p className="bg-blue-600 rounded-lg w-fit px-3 py-1 text-xs">
+                    <p className="bg-blue-600 rounded-lg w-fit px-3 py-1 text-xs text-white">
                       {university.partnerType}
                     </p>
                   ) : (
-                    <p className="bg-gray-600 rounded-lg w-fit px-3 py-1 text-xs">
+                    <p className="bg-gray-600 rounded-lg w-fit px-3 py-1 text-xs text-white">
                       {university.partnerType}
                     </p>
                   )}

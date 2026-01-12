@@ -61,7 +61,7 @@ const Courses = () => {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl text-white font-bold">Courses / Programs</h1>
+          <h1 className="text-2xl font-bold">Courses / Programs</h1>
           <p className="text-gray-400">Manage course offerings and programs</p>
         </div>
         <button className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
@@ -69,8 +69,8 @@ const Courses = () => {
         </button>
       </div>
 
-      <div className="bg-[#0B0F14] rounded-lg p-4 sm:p-6">
-        <h2 className="text-lg text-white font-semibold mb-2">All Courses</h2>
+      <div className="rounded-lg p-4 sm:p-6 border border-gray-400">
+        <h2 className="text-lg font-semibold mb-2">All Courses</h2>
         <p className="text-gray-400 text-sm mb-4">
           Browse and manage available courses and programs
         </p>
@@ -82,7 +82,7 @@ const Courses = () => {
             <input
               type="text"
               placeholder="Search courses..."
-              className="w-full bg-[#0B0F14] text-white pl-10 pr-2 py-2 rounded-lg 
+              className="w-full  pl-10 pr-2 py-2 rounded-lg 
 border border-gray-700 focus:outline-none focus:border-blue-500"
             />
           </div>
