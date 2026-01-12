@@ -4,16 +4,21 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Counselors from "./pages/Counsul.jsx";
 import Courses from "./pages/Courses.jsx";
 import Universities from "./pages/Universities.jsx";
+import UsersRoles from "./pages/UsersRoles.jsx";
+import Students from "./pages/Student.jsx";
+
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />}>
+      <Route path="/" element={<Dashboard />}/>
+        <Route path="userrole" element={<UsersRoles />} />
+        <Route path="student" element={<Students />} />
         <Route path="courses" element={<Courses />} />
         <Route path="universities" element={<Universities />} />
-      </Route>
-
       <Route path="/counselor" element={<Counselors />} />
+      {/* </Route> */}
+
     </Routes>
   );
 }
