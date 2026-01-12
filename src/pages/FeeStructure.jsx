@@ -3,6 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
 import { Plus } from "lucide-react";
+import FormModal from "../components/modal/FormModal";
 
 const FeeStructure = () => {
   const [fees, setFees] = useState([
@@ -44,6 +45,46 @@ const FeeStructure = () => {
     "Currency",
     "Actions",
   ];
+  const feeFields = [
+    {
+      name: "consultancy",
+      label: "Consultancy",
+      placeholder: "Global Study Partners",
+    },
+    {
+      name: "feeType",
+      label: "Fee Type",
+      type: "select",
+      options: [
+        "Document Verification",
+        "Application Processing",
+        "Visa Assistance",
+        "Counseling Fee",
+      ],
+    },
+    {
+      name: "amount",
+      label: "Amount",
+      type: "number",
+      placeholder: "150",
+    },
+    {
+      name: "currency",
+      label: "Currency",
+      type: "select",
+      options: ["USD", "GBP", "EUR", "AUD"],
+    },
+  ];
+
+  const handleAddFee = (newFee) => {
+    setFees((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        ...newFee,
+      },
+    ]);
+  };
 
   return (
     <div className="flex flex-col gap-6 ">
@@ -53,7 +94,10 @@ const FeeStructure = () => {
           <h1 className="text-2xl font-bold">Fee Structure</h1>
           <p className="text-gray-400">Manage fee types and pricing</p>
         </div>
-        <button className="flex gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
+        <button
+          onClick={() => document.getElementById("add_fee_modal").showModal()}
+          className="flex gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
+        >
           <Plus size={18} /> Add Fee
         </button>
       </div>
@@ -134,6 +178,12 @@ const FeeStructure = () => {
           ))}
         </div>
       </div>
+      <FormModal
+        id="add_fee_modal"
+        title="Add Fee Structure"
+        fields={feeFields}
+        onSave={handleAddFee}
+      />
     </div>
   );
 };

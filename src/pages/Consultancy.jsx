@@ -4,6 +4,7 @@ import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
 import abc from "../assets/logos/abc.jpg";
 import { Plus } from "lucide-react";
+import FormModal from "../components/modal/FormModal";
 
 const Consultancy = () => {
   const [consultancies, setConsultancies] = useState([
@@ -46,6 +47,69 @@ const Consultancy = () => {
     "Actions",
   ];
 
+  const consultancyFields = [
+    {
+      name: "logo",
+      label: "Logo",
+      type: "file",
+    },
+    {
+      name: "name",
+      label: "Consultancy Name",
+      placeholder: "Global Study Partners",
+    },
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "info@globalstudy.com",
+    },
+    {
+      name: "phone",
+      label: "Phone Number",
+      placeholder: "+44-20-1234-5678",
+    },
+    {
+      name: "country",
+      label: "Country",
+      type: "select",
+      options: ["UK", "USA", "Australia", "Canada", "Germany"],
+    },
+    {
+      name: "serviceFee",
+      label: "Service Fee",
+      type: "number",
+      placeholder: "400",
+    },
+    {
+      name: "currency",
+      label: "Currency",
+      type: "select",
+      options: ["GBP", "USD", "AUD", "EUR"],
+    },
+    {
+      name: "students",
+      label: "Students Enrolled",
+      type: "number",
+      placeholder: "189",
+    },
+    {
+      name: "status",
+      label: "Status",
+      type: "select",
+      options: ["Active", "Inactive"],
+    },
+  ];
+  const handleAddConsultancy = (newConsultancy) => {
+    setConsultancies((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        status: "Active",
+        ...newConsultancy,
+      },
+    ]);
+  };
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -55,7 +119,12 @@ const Consultancy = () => {
             Manage consultancy information and services
           </p>
         </div>
-        <button className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
+        <button
+          onClick={() =>
+            document.getElementById("add_consultancy_modal").showModal()
+          }
+          className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
+        >
           <Plus size={18} /> Add Consultancy
         </button>
       </div>
@@ -170,6 +239,12 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
           </div>
         </div>
       </div>
+      <FormModal
+        id="add_consultancy_modal"
+        title="Add Consultancy"
+        fields={consultancyFields}
+        onSave={handleAddConsultancy}
+      />
     </div>
   );
 };

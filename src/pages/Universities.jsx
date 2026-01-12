@@ -4,6 +4,7 @@ import Table from "../components/Table";
 import oxford from "../assets/logos/oxford.png";
 import MobileCard from "../components/MobileCard";
 import { Plus } from "lucide-react";
+import FormModal from "../components/modal/FormModal";
 
 const Universities = () => {
   const [universities, setUniversities] = useState([
@@ -54,6 +55,61 @@ const Universities = () => {
     "Actions",
   ];
 
+  const uniFields = [
+    {
+      name: "logo",
+      label: "Logo",
+      type: "file",
+    },
+    {
+      name: "name",
+      label: "University Name",
+      placeholder: "Stanford University",
+    },
+    {
+      name: "country",
+      label: "Country",
+      type: "select",
+      options: ["USA", "UK", "Australia", "Canada"],
+    },
+    { name: "city", label: "City", placeholder: "Stanford" },
+    {
+      name: "partnerType",
+      label: "Partner Type",
+      type: "select",
+      options: ["Partner", "Non-Partner"],
+    },
+    {
+      name: "programs",
+      label: "Number of Programs",
+      type: "number",
+      placeholder: "52",
+    },
+    {
+      name: "applicationFee",
+      label: "Application Fee ($)",
+      type: "number",
+      placeholder: "75",
+    },
+    {
+      name: "status",
+      label: "Status",
+      type: "select",
+      options: ["Active", "Inactive"],
+    },
+  ];
+
+  const handleAddUni = (newUni) => {
+    setUniversities((prev) => [
+      ...prev,
+      {
+        id: prev.lenghth + 1,
+        status: "Active",
+        ...newUni,
+      },
+    ]);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -63,7 +119,10 @@ const Universities = () => {
             Manage partner and non-partner institutions
           </p>
         </div>
-        <button className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
+        <button
+          onClick={() => document.getElementById("add_uni_modal").showModal()}
+          className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
+        >
           <Plus size={18} /> Add University
         </button>
       </div>
@@ -193,6 +252,12 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
           </div>
         </div>
       </div>
+      <FormModal
+        id="add_uni_modal"
+        title="Add University"
+        fields={uniFields}
+        onSave={handleAddUni}
+      />
     </div>
   );
 };

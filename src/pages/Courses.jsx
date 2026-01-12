@@ -3,6 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
 import { Plus } from "lucide-react";
+import FormModal from "../components/modal/FormModal";
 
 const Courses = () => {
   const [courses, setCourses] = useState([
@@ -11,11 +12,11 @@ const Courses = () => {
       name: "BSc Information Technology",
       level: "Bachelor",
       field: "IT",
-      duration: "3 Years",
+      duration: "3",
       intake: "Jan, Sep",
       country: "Australia",
       university: "Sydney University",
-      tuitionFee: "$15,000/year",
+      tuitionFee: "15,000",
       status: "Active",
     },
     {
@@ -23,11 +24,11 @@ const Courses = () => {
       name: "MSc Computer Science",
       level: "Master",
       field: "IT",
-      duration: "2 Years",
+      duration: "2",
       intake: "Feb, Sep",
       country: "UK",
       university: "Oxford University",
-      tuitionFee: "$25,000/year",
+      tuitionFee: "25,000",
       status: "Active",
     },
     {
@@ -35,11 +36,11 @@ const Courses = () => {
       name: "MBA Business Administration",
       level: "Master",
       field: "Business",
-      duration: "2 Years",
+      duration: "2",
       intake: "Sep",
       country: "USA",
       university: "Stanford University",
-      tuitionFee: "$45,000/year",
+      tuitionFee: "45,000",
       status: "Active",
     },
   ]);
@@ -57,6 +58,47 @@ const Courses = () => {
     "Actions",
   ];
 
+  const courseFields = [
+    { name: "name", label: "Course Name", placeholder: "BSc IT" },
+    {
+      name: "level",
+      label: "Level",
+      type: "select",
+      options: ["Bachelor", "Master"],
+    },
+    { name: "field", label: "Field", placeholder: "IT" },
+    {
+      name: "duration",
+      label: "Duration",
+      placeholder: "3 Years",
+      type: "number",
+    },
+    { name: "intake", label: "Intake", placeholder: "Jan, Sep" },
+    { name: "country", label: "Country", placeholder: "Australia" },
+    {
+      name: "university",
+      label: "University",
+      placeholder: "Sydney University",
+    },
+    {
+      name: "tuitionFee",
+      label: "Tuition Fee",
+      placeholder: "$15,000/year",
+      type: "number",
+    },
+  ];
+
+  const handleAddCourse = (newCourse) => {
+    setCourses((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        status: "Active",
+        ...newCourse,
+      },
+    ]);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -64,7 +106,12 @@ const Courses = () => {
           <h1 className="text-2xl font-bold">Courses / Programs</h1>
           <p className="text-gray-400">Manage course offerings and programs</p>
         </div>
-        <button className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
+        <button
+          onClick={() =>
+            document.getElementById("add_course_modal").showModal()
+          }
+          className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
+        >
           <Plus size={18} /> Add Course
         </button>
       </div>
@@ -107,7 +154,7 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                   {course.field}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.duration}
+                  {course.duration} Years
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
                   {course.intake}
@@ -119,7 +166,7 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                   {course.university}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.tuitionFee}
+                  ${course.tuitionFee}/year
                 </td>
                 <td className="px-2 sm:px-4 py-4">
                   <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs">
@@ -172,6 +219,12 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
           </div>
         </div>
       </div>
+      <FormModal
+        id="add_course_modal"
+        title="Add Course"
+        fields={courseFields}
+        onSave={handleAddCourse}
+      />
     </div>
   );
 };
