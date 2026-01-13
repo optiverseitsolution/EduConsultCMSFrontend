@@ -27,21 +27,12 @@ const counselors = [
 
 const Counselors = () => {
   return (
-<<<<<<< HEAD
-    <div className="flex min-h-screen ">
-      <main className="flex-1
-      
-      
-      
-      ">
-=======
     <div className="flex min-h-screen">
-      {/* Sidebar stays LEFT on all screens */}
+      {/* Sidebar */}
       <Sidebar />
 
       {/* Main content */}
       <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
->>>>>>> md
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
@@ -81,26 +72,20 @@ const Counselors = () => {
           {/* Table */}
           <div className="overflow-x-auto">
             <table className="table w-full border-none min-w-[900px]">
-              <thead className="border-none">
-                <tr className="border-none text-[13px] uppercase tracking-wider">
+              <thead>
+                <tr className="text-[13px] uppercase tracking-wider">
                   <th className="bg-transparent pl-0 font-medium">S.N.</th>
                   <th className="bg-transparent font-medium">Counselor</th>
                   <th className="bg-transparent font-medium">Email</th>
-<<<<<<< HEAD
                   <th className="bg-transparent font-medium text-center">
                     Counseling Country
                   </th>
                   <th className="bg-transparent font-medium text-center">
                     Status
                   </th>
-                  <th className="bg-transparent text-right pr-0 font-medium">
+                  <th className="bg-transparent font-medium text-left pr-0">
                     Actions
                   </th>
-=======
-                  <th className="bg-transparent font-medium text-center">Counseling Country</th>
-                  <th className="bg-transparent font-medium text-center">Status</th>
-                  <th className="bg-transparent text-left pr-0 font-medium">Actions</th>
->>>>>>> md
                 </tr>
               </thead>
 
@@ -108,26 +93,17 @@ const Counselors = () => {
                 {counselors.map((c, index) => (
                   <tr
                     key={c.id}
-                    className="border-none hover:bg-white/5 transition-colors group"
+                    className="hover:bg-white/5 transition-colors"
                   >
-<<<<<<< HEAD
-                    <td className="pl-0 ">{index + 1}</td>
-=======
                     <td className="pl-0">{index + 1}</td>
->>>>>>> md
 
                     <td className="py-4">
                       <div className="flex items-center gap-3">
                         <div className="avatar">
-<<<<<<< HEAD
-                          <div className="w-9 rounded-full ">
-                            {/* Placeholder for the person icon shown in your image */}
-=======
                           <div className="w-9 rounded-full">
->>>>>>> md
                             <img
                               src={`https://ui-avatars.com/api/?name=${c.name}&background=fdba74&color=7c2d12`}
-                              alt="avatar"
+                              alt={c.name}
                             />
                           </div>
                         </div>
@@ -150,8 +126,8 @@ const Counselors = () => {
                       </span>
                     </td>
 
-                    <td className="text-right pr-0">
-                      <div className="flex flex-wrap items-center justify-start gap-3 sm:gap-5">
+                    <td className="pr-0">
+                      <div className="flex gap-4">
                         <button className="font-medium">View</button>
                         <button className="font-medium">Edit</button>
                         <button className="font-medium">Delete</button>
