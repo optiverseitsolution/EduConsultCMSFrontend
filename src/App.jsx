@@ -6,23 +6,23 @@ import Courses from "./pages/Courses.jsx";
 import Universities from "./pages/Universities.jsx";
 import UsersRoles from "./pages/UsersRoles.jsx";
 import Students from "./pages/Student.jsx";
-
 import Consultancy from "./pages/Consultancy.jsx";
 import FeeStructure from "./pages/FeeStructure.jsx";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="userrole" element={<UsersRoles />} />
-      <Route path="student" element={<Students />} />
-      <Route path="courses" element={<Courses />} />
-      <Route path="universities" element={<Universities />} />
-      <Route path="counselor" element={<Counselors />} />
-      <Route path="consultancy" element={<Consultancy />} />
-      <Route path="fee" element={<FeeStructure />} />
+      {/* Layout Route */}
+      <Route path="/" element={<Dashboard />}>
+        <Route path="userrole" element={<UsersRoles />} />
+        <Route path="student" element={<Students />} />
+        <Route path="courses" element={<Courses />} />
+        <Route path="universities" element={<Universities />} />
+        <Route path="counselor" element={<Counselors />} />
+        <Route path="consultancy" element={<Consultancy />} />
+        <Route path="fee" element={<FeeStructure />} />
+      </Route>
     </Routes>
-     
   );
 }
 

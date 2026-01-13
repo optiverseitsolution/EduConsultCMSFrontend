@@ -14,26 +14,16 @@ import { FaMoon, FaSun } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
-  // for new components added please add the path directly here as well as in App.jsx
+  // Add new routes here AND in App.jsx
   const navItems = [
     { id: "dashboard", label: "Dashboard", path: "/", icon: LayoutDashboard },
     { id: "users-roles", label: "Users & Roles", path: "/userrole", icon: Shield },
     { id: "students", label: "Students", path: "/student", icon: GraduationCap },
-    { id: "courses", label: "Courses", path: "courses", icon: BookOpen },
-    {
-      id: "universities",
-      label: "Universities",
-      path: "universities",
-      icon: Building2,
-    },
-    { id: "counselors", label: "Counselors", path: "counselor", icon: UserCog },
-    {
-      id: "consultancy",
-      label: "Consultancy",
-      path: "consultancy",
-      icon: Briefcase,
-    },
-    { id: "fees", label: "Fee Structure", path: "fee", icon: DollarSign },
+    { id: "courses", label: "Courses", path: "/courses", icon: BookOpen },
+    { id: "universities", label: "Universities", path: "/universities", icon: Building2 },
+    { id: "counselors", label: "Counselors", path: "/counselor", icon: UserCog },
+    { id: "consultancy", label: "Consultancy", path: "/consultancy", icon: Briefcase },
+    { id: "fees", label: "Fee Structure", path: "/fee", icon: DollarSign },
   ];
 
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -56,7 +46,7 @@ const Sidebar = () => {
           <div className="p-2 bg-blue-600 rounded-lg text-white">
             <GraduationCap size={32} />
           </div>
-          <h1 className="hidden md:flex text-xl font-bold items-center justify-center text-center">
+          <h1 className="hidden md:flex text-xl font-bold text-center">
             EduConsult CMS
           </h1>
         </div>
@@ -87,7 +77,9 @@ const Sidebar = () => {
           <input
             type="checkbox"
             checked={theme === "dark"}
-            onChange={() => setTheme(theme === "light" ? "dark" : "light")}
+            onChange={() =>
+              setTheme(theme === "light" ? "dark" : "light")
+            }
           />
           <FaSun className="swap-off text-xl" />
           <FaMoon className="swap-on text-xl" />
