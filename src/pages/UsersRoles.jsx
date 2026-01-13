@@ -1,71 +1,70 @@
 import { Plus, Search } from "lucide-react";
 import Sidebar from "../components/SideBar";
 
-const counselors = [
+const users = [
   {
     id: 1,
     name: "John Doe",
-    email: "john.counselor@example.com",
-    countries: "UK, USA",
-    status: "Available",
+    email: "john@example.com",
+    role: "Super Admin",
+    status: "Active",
   },
   {
     id: 2,
     name: "Jane Smith",
-    email: "jane.counselor@example.com",
-    countries: "Australia, Canada",
-    status: "Busy",
+    email: "jane@example.com",
+    role: "Admin",
+    status: "Active",
   },
   {
     id: 3,
     name: "Mike Johnson",
-    email: "mike.counselor@example.com",
-    countries: "Japan, South Korea",
-    status: "Available",
+    email: "mike@example.com",
+    role: "Counselor",
+    status: "Active",
+  },
+  {
+    id: 4,
+    name: "Sarah Williams",
+    email: "sarah@example.com",
+    role: "Manager",
+    status: "Inactive",
   },
 ];
 
-const Counselors = () => {
+const UsersRoles = () => {
   return (
-<<<<<<< HEAD
-    <div className="flex min-h-screen ">
-      <main className="flex-1
-      
-      
-      
-      ">
-=======
     <div className="flex min-h-screen">
-      {/* Sidebar stays LEFT on all screens */}
+      {/* Sidebar stays LEFT */}
       <Sidebar />
 
       {/* Main content */}
       <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
->>>>>>> md
-        {/* Page Header */}
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Counselors</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">Users & Roles</h1>
             <p className="text-gray-400 text-sm mt-1">
-              Manage counselor assignments and availability
+              Manage user permissions and access levels
             </p>
           </div>
 
           <button className="btn btn-primary bg-[#1d4ed8] hover:bg-blue-700 border-none normal-case rounded-lg px-6 w-full sm:w-auto flex items-center justify-center">
-            <Plus size={18} className="mr-1" /> Add Counselor
+            <Plus size={18} className="mr-1" />
+            Add User
           </button>
         </div>
 
-        {/* Main Content Card */}
+        {/* Card */}
         <div className="rounded-xl border border-gray-700 p-4 sm:p-6 lg:p-8">
           <div className="mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold">All Counselors</h2>
+            <h2 className="text-lg sm:text-xl font-semibold">All Users</h2>
             <p className="text-gray-400 text-sm">
-              View and manage all counselors and their assignments
+              View and manage all system users
             </p>
           </div>
 
-          {/* Search Bar */}
+          {/* Search */}
           <div className="relative mb-8">
             <Search
               size={18}
@@ -73,7 +72,7 @@ const Counselors = () => {
             />
             <input
               type="text"
-              placeholder="Search counselors..."
+              placeholder="Search users..."
               className="input w-full pl-12 bg-transparent border-gray-700 focus:border-blue-500 transition-all text-sm"
             />
           </div>
@@ -81,72 +80,59 @@ const Counselors = () => {
           {/* Table */}
           <div className="overflow-x-auto">
             <table className="table w-full border-none min-w-[900px]">
-              <thead className="border-none">
-                <tr className="border-none text-[13px] uppercase tracking-wider">
+              <thead>
+                <tr className="text-[13px] uppercase tracking-wider">
                   <th className="bg-transparent pl-0 font-medium">S.N.</th>
-                  <th className="bg-transparent font-medium">Counselor</th>
+                  <th className="bg-transparent font-medium">User</th>
                   <th className="bg-transparent font-medium">Email</th>
-<<<<<<< HEAD
                   <th className="bg-transparent font-medium text-center">
-                    Counseling Country
+                    Role
                   </th>
                   <th className="bg-transparent font-medium text-center">
                     Status
                   </th>
-                  <th className="bg-transparent text-right pr-0 font-medium">
+                  <th className="bg-transparent text-left pl-0 font-medium">
                     Actions
                   </th>
-=======
-                  <th className="bg-transparent font-medium text-center">Counseling Country</th>
-                  <th className="bg-transparent font-medium text-center">Status</th>
-                  <th className="bg-transparent text-left pr-0 font-medium">Actions</th>
->>>>>>> md
                 </tr>
               </thead>
 
               <tbody className="text-sm">
-                {counselors.map((c, index) => (
-                  <tr
-                    key={c.id}
-                    className="border-none hover:bg-white/5 transition-colors group"
-                  >
-<<<<<<< HEAD
-                    <td className="pl-0 ">{index + 1}</td>
-=======
+                {users.map((u, index) => (
+                  <tr key={u.id} className="hover:bg-white/5 transition-colors">
                     <td className="pl-0">{index + 1}</td>
->>>>>>> md
 
                     <td className="py-4">
                       <div className="flex items-center gap-3">
                         <div className="avatar">
-<<<<<<< HEAD
-                          <div className="w-9 rounded-full ">
-                            {/* Placeholder for the person icon shown in your image */}
-=======
                           <div className="w-9 rounded-full">
->>>>>>> md
                             <img
-                              src={`https://ui-avatars.com/api/?name=${c.name}&background=fdba74&color=7c2d12`}
+                              src={`https://ui-avatars.com/api/?name=${u.name}&background=1d4ed8&color=ffffff`}
                               alt="avatar"
                             />
                           </div>
                         </div>
-                        <span className="font-semibold">{c.name}</span>
+                        <span className="font-semibold">{u.name}</span>
                       </div>
                     </td>
 
-                    <td>{c.email}</td>
-                    <td className="text-center">{c.countries}</td>
+                    <td>{u.email}</td>
+
+                    <td className="text-center">
+                      <span className="badge border-none py-3 px-4 text-xs font-semibold rounded-md bg-gray-700 text-gray-300">
+                        {u.role}
+                      </span>
+                    </td>
 
                     <td className="text-center">
                       <span
                         className={`badge border-none py-3 px-4 text-xs font-semibold rounded-md ${
-                          c.status === "Available"
+                          u.status === "Active"
                             ? "bg-blue-600 text-white"
                             : "bg-gray-700 text-gray-300"
                         }`}
                       >
-                        {c.status}
+                        {u.status}
                       </span>
                     </td>
 
@@ -168,4 +154,4 @@ const Counselors = () => {
   );
 };
 
-export default Counselors;
+export default UsersRoles;

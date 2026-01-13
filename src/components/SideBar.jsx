@@ -17,8 +17,8 @@ const Sidebar = () => {
   // for new components added please add the path directly here as well as in App.jsx
   const navItems = [
     { id: "dashboard", label: "Dashboard", path: "/", icon: LayoutDashboard },
-    { id: "users-roles", label: "Users & Roles", path: "/", icon: Shield },
-    { id: "students", label: "Students", path: "/", icon: GraduationCap },
+    { id: "users-roles", label: "Users & Roles", path: "/userrole", icon: Shield },
+    { id: "students", label: "Students", path: "/student", icon: GraduationCap },
     { id: "courses", label: "Courses", path: "courses", icon: BookOpen },
     {
       id: "universities",
