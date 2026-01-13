@@ -5,6 +5,7 @@ import MobileCard from "../components/MobileCard";
 import abc from "../assets/logos/abc.jpg";
 import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
+import ViewModal from "../components/modal/ViewModal";
 
 const Consultancy = () => {
   const [consultancies, setConsultancies] = useState([
@@ -110,6 +111,9 @@ const Consultancy = () => {
       },
     ]);
   };
+
+  const [selectedConsultancy, setSelectedConsultancy] = useState(null);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -123,7 +127,7 @@ const Consultancy = () => {
           onClick={() =>
             document.getElementById("add_consultancy_modal").showModal()
           }
-          className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
+          className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto hover:cursor-pointer"
         >
           <Plus size={18} /> Add Consultancy
         </button>
@@ -153,10 +157,7 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
             headers={headers}
             data={consultancies}
             renderRow={(c) => (
-              <tr
-                key={c.id}
-                className="border-b border-gray-700 hover:bg-gray-800"
-              >
+              <tr key={c.id} className="border-b border-gray-700 ">
                 <td className="px-2 sm:px-4 ">
                   <img
                     src={c.logo}
@@ -193,7 +194,15 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                 </td>
                 <td className="px-2 sm:px-4 py-4">
                   <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
-                    <button className="hover:text-blue-300">View</button>
+                    <button
+                      className="hover:text-blue-300 hover:cursor-pointer"
+                      onClick={() => {
+                        setSelectedConsultancy(c);
+                        document.getElementById("view_c_modal").showModal();
+                      }}
+                    >
+                      View
+                    </button>
                     <button className="hover:text-blue-300">Edit</button>
                     <button className="hover:text-red-300">Delete</button>
                   </div>
@@ -221,7 +230,10 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                   {
                     label: "View",
                     className: "text-blue-400 text-sm",
-                    onClick: () => console.log("View", c),
+                    onClick: () => {
+                      setSelectedConsultancy(c);
+                      document.getElementById("view_c_modal").showModal();
+                    },
                   },
                   {
                     label: "Edit",
@@ -244,6 +256,12 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
         title="Add Consultancy"
         fields={consultancyFields}
         onSave={handleAddConsultancy}
+      />
+      <ViewModal
+        id="view_c_modal"
+        title="Consultancy"
+        fields={consultancyFields}
+        data={selectedConsultancy}
       />
     </div>
   );

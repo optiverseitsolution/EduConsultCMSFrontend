@@ -2,16 +2,33 @@ import React, { useState } from "react";
 
 const FormModal = ({ id, title, fields, onSave }) => {
   const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    let newErrors = {};
+
+    fields.forEach((field) => {
+      if (!formData[field.name]) {
+        newErrors[field.name] = `${field.label} is required`;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     onSave(formData);
     document.getElementById(id).close();
     setFormData({});
+    setErrors({});
   };
 
   return (
@@ -33,8 +50,11 @@ const FormModal = ({ id, title, fields, onSave }) => {
               <label className="label font-medium">{field.label}</label>
 
               {field.type === "file" ? (
-                <div className="w-full ">
-                  <label className="flex items-center justify-between gap-4 input input-bordered w-full px-4 py-3 cursor-pointer hover:border-primary transition">
+                <>
+                  <label
+                    className={`flex items-center justify-between gap-4 input input-bordered w-full px-4 py-3 cursor-pointer
+                      ${errors[field.name] ? "border-red-500" : ""}`}
+                  >
                     <span className="text-sm text-gray-500">
                       {formData[field.name]?.name || "Choose file"}
                     </span>
@@ -49,14 +69,30 @@ const FormModal = ({ id, title, fields, onSave }) => {
                       }
                     />
                   </label>
-                </div>
+
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[field.name]}
+                    </p>
+                  )}
+                </>
               ) : (
-                <input
-                  type={field.type || "text"}
-                  placeholder={field.placeholder}
-                  className="input input-bordered w-full"
-                  onChange={(e) => handleChange(field.name, e.target.value)}
-                />
+                <>
+                  <input
+                    type={field.type || "text"}
+                    placeholder={field.placeholder}
+                    className={`input input-bordered w-full ${
+                      errors[field.name] ? "border-red-500" : ""
+                    }`}
+                    onChange={(e) => handleChange(field.name, e.target.value)}
+                  />
+
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[field.name]}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           ))}
@@ -69,7 +105,7 @@ const FormModal = ({ id, title, fields, onSave }) => {
             >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn bg-blue-600 text-white">
               Save
             </button>
           </div>
