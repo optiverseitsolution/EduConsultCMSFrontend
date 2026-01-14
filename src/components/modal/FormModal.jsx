@@ -13,10 +13,11 @@ const FormModal = ({ id, title, fields, onSave }) => {
     e.preventDefault();
 
     let newErrors = {};
-
     fields.forEach((field) => {
-      if (!formData[field.name]) {
-        newErrors[field.name] = `${field.label} is required`;
+      const value = formData[field.name];
+
+      if (field.type === "number" && value < 0) {
+        newErrors[field.name] = `${field.label} cannot be negative`;
       }
     });
 
@@ -80,6 +81,7 @@ const FormModal = ({ id, title, fields, onSave }) => {
                 <>
                   <input
                     type={field.type || "text"}
+                    value={formData[field.name] || ""}
                     placeholder={field.placeholder}
                     className={`input input-bordered w-full ${
                       errors[field.name] ? "border-red-500" : ""

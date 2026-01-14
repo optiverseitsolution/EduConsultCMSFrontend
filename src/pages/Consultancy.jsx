@@ -6,6 +6,7 @@ import abc from "../assets/logos/abc.jpg";
 import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
 import ViewModal from "../components/modal/ViewModal";
+import SeacrhModal from "./../components/modal/SeacrhModal";
 
 const Consultancy = () => {
   const [consultancies, setConsultancies] = useState([
@@ -69,6 +70,7 @@ const Consultancy = () => {
       name: "phone",
       label: "Phone Number",
       placeholder: "+44-20-1234-5678",
+      min: "0",
     },
     {
       name: "country",
@@ -81,6 +83,7 @@ const Consultancy = () => {
       label: "Service Fee",
       type: "number",
       placeholder: "400",
+      min: "0",
     },
     {
       name: "currency",
@@ -93,6 +96,7 @@ const Consultancy = () => {
       label: "Students Enrolled",
       type: "number",
       placeholder: "189",
+      min: "0",
     },
     {
       name: "status",
@@ -113,6 +117,11 @@ const Consultancy = () => {
   };
 
   const [selectedConsultancy, setSelectedConsultancy] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredConsultancy = consultancies.filter((c) =>
+    Object.values(c).join(" ").toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -139,23 +148,16 @@ const Consultancy = () => {
           View and manage consultancy partnerships
         </p>
         {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-
-            <input
-              type="text"
-              placeholder="Search consultancies..."
-              className="w-full pl-10 pr-2 py-2 rounded-lg 
-border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-        </div>
+        <SeacrhModal
+          placeholder="consultancies"
+          value={search}
+          onChange={setSearch}
+        />
         {/* Table */}
         <div className="overflow-x-auto">
           <Table
             headers={headers}
-            data={consultancies}
+            data={filteredConsultancy}
             renderRow={(c) => (
               <tr key={c.id} className="border-b border-gray-700 ">
                 <td className="px-2 sm:px-4 ">

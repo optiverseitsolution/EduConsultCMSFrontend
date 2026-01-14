@@ -4,6 +4,7 @@ import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
 import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
+import SeacrhModal from "../components/modal/SeacrhModal";
 
 const FeeStructure = () => {
   const [fees, setFees] = useState([
@@ -67,6 +68,7 @@ const FeeStructure = () => {
       label: "Amount",
       type: "number",
       placeholder: "150",
+      min: "0",
     },
     {
       name: "currency",
@@ -86,7 +88,11 @@ const FeeStructure = () => {
     ]);
   };
 
-  const [selectedFee, setSelectedFee] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredFee = fees.filter((fee) =>
+    Object.values(fee).join(" ").toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col gap-6 ">
@@ -110,21 +116,12 @@ const FeeStructure = () => {
           View and manage all fee structures
         </p>
 
-        <div className="mb-6">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search fees..."
-              className="w-full  pl-10 pr-2 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-        </div>
+        <SeacrhModal placeholder="fees" onChange={setSearch} value={search} />
 
         <div className="overflow-x-auto hidden md:block">
           <Table
             headers={headers}
-            data={fees}
+            data={filteredFee}
             renderRow={(fee) => (
               <tr
                 key={fee.id}

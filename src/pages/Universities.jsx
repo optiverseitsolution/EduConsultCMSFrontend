@@ -6,6 +6,7 @@ import MobileCard from "../components/MobileCard";
 import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
 import ViewModal from "../components/modal/ViewModal";
+import SeacrhModal from "../components/modal/SeacrhModal";
 
 const Universities = () => {
   const [universities, setUniversities] = useState([
@@ -85,12 +86,14 @@ const Universities = () => {
       label: "Number of Programs",
       type: "number",
       placeholder: "52",
+      min: "0",
     },
     {
       name: "applicationFee",
       label: "Application Fee ($)",
       type: "number",
       placeholder: "75",
+      min: "0",
     },
     {
       name: "status",
@@ -112,6 +115,11 @@ const Universities = () => {
   };
 
   const [selectedUni, setSelectedUni] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredUni = universities.filter((uni) =>
+    Object.values(uni).join(" ").toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -136,23 +144,16 @@ const Universities = () => {
           View and manage university partnerships
         </p>
         {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-
-            <input
-              type="text"
-              placeholder="Search universities..."
-              className="w-full pl-10 pr-2 py-2 rounded-lg 
-border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-        </div>
+        <SeacrhModal
+          placeholder="universities"
+          value={search}
+          onChange={setSearch}
+        />
         {/* Table */}
         <div className="overflow-x-auto">
           <Table
             headers={headers}
-            data={universities}
+            data={filteredUni}
             renderRow={(university) => (
               <tr key={university.id} className="border-b border-gray-700">
                 <td className="px-2 sm:px-4 ">
