@@ -16,6 +16,10 @@ const FormModal = ({ id, title, fields, onSave }) => {
     fields.forEach((field) => {
       const value = formData[field.name];
 
+      if (!formData[field.name]) {
+        newErrors[field.name] = `${field.label} is required`;
+      }
+
       if (field.type === "number" && value < 0) {
         newErrors[field.name] = `${field.label} cannot be negative`;
       }
