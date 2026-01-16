@@ -30,7 +30,7 @@ const RecentApplications = () => {
                 </p>
               </div>
 
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-900/40  border border-green-700 whitespace-nowrap">
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-900/40   border border-green-700 whitespace-nowrap">
                 {app.status}
               </span>
             </li>

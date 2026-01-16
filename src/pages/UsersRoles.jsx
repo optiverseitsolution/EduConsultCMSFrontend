@@ -1,152 +1,215 @@
-import { Plus, Search } from "lucide-react";
-import Sidebar from "../components/SideBar";
+import React, { useState } from "react";
+import { Plus } from "lucide-react";
+import { FaSearch } from "react-icons/fa";
+import Table from "../components/Table";
+import MobileCard from "../components/MobileCard";
+import FormModal from "../components/modal/FormModal";
 
-const users = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    role: "Super Admin",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "Admin",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Mike Johnson",
-    email: "mike@example.com",
-    role: "Counselor",
-    status: "Active",
-  },
-  {
-    id: 4,
-    name: "Sarah Williams",
-    email: "sarah@example.com",
-    role: "Manager",
-    status: "Inactive",
-  },
-];
+const headers = ["S.N.", "User", "Email", "Role", "Status", "Actions"];
 
 const UsersRoles = () => {
-  return (
-    <div className="flex min-h-screen">
-       {/* Main content */}
-      <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Users & Roles</h1>
-            <p className="text-gray-400 text-sm mt-1">
-              Manage user permissions and access levels
-            </p>
-          </div>
+  const [users, setUsers] = useState([
+    {
+      id: 1,
+      name: "John Doe",
+      email: "john@example.com",
+      role: "Super Admin",
+      status: "Active",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      email: "jane@example.com",
+      role: "Admin",
+      status: "Active",
+    },
+    {
+      id: 3,
+      name: "Mike Johnson",
+      email: "mike@example.com",
+      role: "Counselor",
+      status: "Active",
+    },
+    {
+      id: 4,
+      name: "Sarah Williams",
+      email: "sarah@example.com",
+      role: "Manager",
+      status: "Inactive",
+    },
+  ]);
 
-          <button className="btn btn-primary bg-[#1d4ed8] hover:bg-blue-700 border-none normal-case rounded-lg px-6 w-full sm:w-auto flex items-center justify-center">
-            <Plus size={18} className="mr-1" />
-            Add User
-          </button>
+  /** 🔹 Modal Fields */
+  const userFields = [
+    {
+      name: "name",
+      label: "Full Name",
+      placeholder: "John Doe",
+    },
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "john@example.com",
+    },
+    {
+      name: "role",
+      label: "Role",
+      type: "select",
+      options: ["Super Admin", "Admin", "Manager", "Counselor"],
+    },
+    {
+      name: "status",
+      label: "Status",
+      type: "select",
+      options: ["Active", "Inactive"],
+    },
+  ];
+
+  /** 🔹 Add User */
+  const handleAddUser = (newUser) => {
+    setUsers((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        ...newUser,
+      },
+    ]);
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Users & Roles</h1>
+          <p className="text-gray-400">
+            Manage user permissions and access levels
+          </p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-xl border border-gray-700 p-4 sm:p-6 lg:p-8">
-          <div className="mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold">All Users</h2>
-            <p className="text-gray-400 text-sm">
-              View and manage all system users
-            </p>
-          </div>
+        <button
+          onClick={() =>
+            document.getElementById("add_user_modal").showModal()
+          }
+          className="flex gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
+        >
+          <Plus size={18} />
+          Add User
+        </button>
+      </div>
 
-          {/* Search */}
-          <div className="relative mb-8">
-            <Search
-              size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2"
-            />
+      {/* Card */}
+      <div className="rounded-lg p-4 sm:p-6 border border-gray-400">
+        <h2 className="text-lg font-semibold mb-2">All Users</h2>
+        <p className="text-gray-400 text-sm mb-4">
+          View and manage all system users
+        </p>
+
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search users..."
-              className="input w-full pl-12 bg-transparent border-gray-700 focus:border-blue-500 transition-all text-sm"
+              className="w-full pl-10 pr-2 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-blue-500"
             />
           </div>
+        </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="table w-full border-none min-w-[900px]">
-              <thead>
-                <tr className="text-[13px] uppercase tracking-wider">
-                  <th className="bg-transparent pl-0 font-medium">S.N.</th>
-                  <th className="bg-transparent font-medium">User</th>
-                  <th className="bg-transparent font-medium">Email</th>
-                  <th className="bg-transparent font-medium text-center">
-                    Role
-                  </th>
-                  <th className="bg-transparent font-medium text-center">
-                    Status
-                  </th>
-                  <th className="bg-transparent text-left pl-0 font-medium">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <Table
+            headers={headers}
+            data={users}
+            renderRow={(u, index) => (
+              <tr key={u.id} className="border-b border-gray-700">
+                <td className="px-2 sm:px-4 py-4">{index + 1}</td>
 
-              <tbody className="text-sm">
-                {users.map((u, index) => (
-                  <tr key={u.id} className="hover:bg-white/5 transition-colors">
-                    <td className="pl-0">{index + 1}</td>
+                <td className="px-2 sm:px-4 py-4">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${u.name}`}
+                      alt={u.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span>{u.name}</span>
+                  </div>
+                </td>
 
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="avatar">
-                          <div className="w-9 rounded-full">
-                            <img
-                              src={`https://ui-avatars.com/api/?name=${u.name}&background=1d4ed8&color=ffffff`}
-                              alt="avatar"
-                            />
-                          </div>
-                        </div>
-                        <span className="font-semibold">{u.name}</span>
-                      </div>
-                    </td>
+                <td className="px-2 sm:px-4 py-4">{u.email}</td>
 
-                    <td>{u.email}</td>
+                <td className="px-2 sm:px-4 py-4 text-center">
+                  <span className="bg-gray-600 text-white px-3 py-1 rounded-lg text-xs">
+                    {u.role}
+                  </span>
+                </td>
 
-                    <td className="text-center">
-                      <span className="badge border-none py-3 px-4 text-xs font-semibold rounded-md bg-gray-700 text-gray-300">
-                        {u.role}
-                      </span>
-                    </td>
+                <td className="px-2 sm:px-4 py-4 text-center">
+                  <span
+                    className={`px-3 py-1 rounded-lg text-xs ${
+                      u.status === "Active"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-600 text-gray-200"
+                    }`}
+                  >
+                    {u.status}
+                  </span>
+                </td>
 
-                    <td className="text-center">
-                      <span
-                        className={`badge border-none py-3 px-4 text-xs font-semibold rounded-md ${
-                          u.status === "Active"
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-700 text-gray-300"
-                        }`}
-                      >
-                        {u.status}
-                      </span>
-                    </td>
+                <td className="px-2 sm:px-4 py-4">
+                  <div className="flex gap-3 text-sm">
+                    <button className="hover:text-blue-300">View</button>
+                    <button className="hover:text-blue-300">Edit</button>
+                    <button className="hover:text-red-300">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            )}
+          />
 
-                    <td className="text-right pr-0">
-                      <div className="flex flex-wrap items-center justify-start gap-3 sm:gap-5">
-                        <button className="font-medium">View</button>
-                        <button className="font-medium">Edit</button>
-                        <button className="font-medium">Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {users.map((u) => (
+              <MobileCard
+                key={u.id}
+                title={u.name}
+                fields={[
+                  { label: "Email", value: u.email },
+                  { label: "Role", value: u.role },
+                  { label: "Status", value: u.status },
+                ]}
+                actions={[
+                  {
+                    label: "View",
+                    className: "text-blue-400 text-sm",
+                    onClick: () => console.log("View", u),
+                  },
+                  {
+                    label: "Edit",
+                    className: "text-blue-400 text-sm",
+                    onClick: () => console.log("Edit", u),
+                  },
+                  {
+                    label: "Delete",
+                    className: "text-red-400 text-sm",
+                    onClick: () => console.log("Delete", u),
+                  },
+                ]}
+              />
+            ))}
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* 🔹 Add User Modal */}
+      <FormModal
+        id="add_user_modal"
+        title="Add User"
+        fields={userFields}
+        onSave={handleAddUser}
+      />
     </div>
   );
 };
