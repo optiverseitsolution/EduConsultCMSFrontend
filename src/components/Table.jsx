@@ -3,7 +3,7 @@ import React from "react";
 const Table = ({ headers = [], data = [], renderRow }) => {
   return (
     <div className="overflow-x-auto max-md:hidden">
-      <table className="w-full text-sm text-gray-300">
+      <table className="w-full text-sm ">
         <thead>
           <tr className="border-b border-gray-700 text-left font-bold">
             {headers.map((header, index) => (
@@ -19,10 +19,7 @@ const Table = ({ headers = [], data = [], renderRow }) => {
             data.map((item, index) => renderRow(item, index))
           ) : (
             <tr>
-              <td
-                colSpan={headers.length}
-                className="text-center py-6 text-gray-400"
-              >
+              <td colSpan={headers.length} className="text-center py-6">
                 No data found
               </td>
             </tr>

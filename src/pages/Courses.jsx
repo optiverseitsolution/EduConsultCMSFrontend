@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
+import { Plus } from "lucide-react";
+import FormModal from "../components/modal/FormModal";
+import ViewModal from "../components/modal/ViewModal";
+import SeacrhModal from "../components/modal/SeacrhModal";
 
 const Courses = () => {
   const [courses, setCourses] = useState([
@@ -10,11 +14,11 @@ const Courses = () => {
       name: "BSc Information Technology",
       level: "Bachelor",
       field: "IT",
-      duration: "3 Years",
+      duration: "3",
       intake: "Jan, Sep",
       country: "Australia",
       university: "Sydney University",
-      tuitionFee: "$15,000/year",
+      tuitionFee: "15,000",
       status: "Active",
     },
     {
@@ -22,11 +26,11 @@ const Courses = () => {
       name: "MSc Computer Science",
       level: "Master",
       field: "IT",
-      duration: "2 Years",
+      duration: "2",
       intake: "Feb, Sep",
       country: "UK",
       university: "Oxford University",
-      tuitionFee: "$25,000/year",
+      tuitionFee: "25,000",
       status: "Active",
     },
     {
@@ -34,11 +38,11 @@ const Courses = () => {
       name: "MBA Business Administration",
       level: "Master",
       field: "Business",
-      duration: "2 Years",
+      duration: "2",
       intake: "Sep",
       country: "USA",
       university: "Stanford University",
-      tuitionFee: "$45,000/year",
+      tuitionFee: "45,000",
       status: "Active",
     },
   ]);
@@ -56,46 +60,92 @@ const Courses = () => {
     "Actions",
   ];
 
+  const courseFields = [
+    { name: "name", label: "Course Name", placeholder: "BSc IT" },
+    {
+      name: "level",
+      label: "Level",
+      type: "select",
+      options: ["Bachelor", "Master"],
+    },
+    { name: "field", label: "Field", placeholder: "IT" },
+    {
+      name: "duration",
+      label: "Duration",
+      placeholder: "3 Years",
+      type: "number",
+      min: "0",
+    },
+    { name: "intake", label: "Intake", placeholder: "Jan, Sep" },
+    { name: "country", label: "Country", placeholder: "Australia" },
+    {
+      name: "university",
+      label: "University",
+      placeholder: "Sydney University",
+    },
+    {
+      name: "tuitionFee",
+      label: "Tuition Fee",
+      placeholder: "$15,000/year",
+      type: "number",
+      min: "0",
+    },
+  ];
+
+  const handleAddCourse = (newCourse) => {
+    setCourses((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        status: "Active",
+        ...newCourse,
+      },
+    ]);
+  };
+
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredCourses = courses.filter((course) =>
+    Object.values(course).join(" ").toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl text-white font-bold">Courses / Programs</h1>
+          <h1 className="text-2xl font-bold">Courses / Programs</h1>
           <p className="text-gray-400">Manage course offerings and programs</p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
-          + Add Course
+        <button
+          onClick={() =>
+            document.getElementById("add_course_modal").showModal()
+          }
+          className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto hover:cursor-pointer"
+        >
+          <Plus size={18} /> Add Course
         </button>
       </div>
 
-      <div className="bg-[#0B0F14] rounded-lg p-4 sm:p-6">
-        <h2 className="text-lg text-white font-semibold mb-2">All Courses</h2>
+      <div className="rounded-lg p-4 sm:p-6 border border-gray-400">
+        <h2 className="text-lg font-semibold mb-2">All Courses</h2>
         <p className="text-gray-400 text-sm mb-4">
           Browse and manage available courses and programs
         </p>
         {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
-            <input
-              type="text"
-              placeholder="Search courses..."
-              className="w-full bg-[#0B0F14] text-white pl-10 pr-2 py-2 rounded-lg 
-border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-        </div>
+        <SeacrhModal
+          placeholder="courses"
+          value={search}
+          onChange={setSearch}
+        />
         {/* Table */}
         <div className="overflow-x-auto">
           <Table
             headers={headers}
-            data={courses}
+            data={filteredCourses}
             renderRow={(course) => (
-              <tr
-                key={course.id}
-                className="border-b border-gray-700 hover:bg-gray-800"
-              >
+              <tr key={course.id} className="border-b border-gray-700 ">
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
                   {course.name}
                 </td>
@@ -106,7 +156,7 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                   {course.field}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.duration}
+                  {course.duration} Years
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
                   {course.intake}
@@ -118,7 +168,7 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                   {course.university}
                 </td>
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.tuitionFee}
+                  ${course.tuitionFee}/year
                 </td>
                 <td className="px-2 sm:px-4 py-4">
                   <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs">
@@ -127,7 +177,18 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                 </td>
                 <td className="px-2 sm:px-4 py-4">
                   <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
-                    <button className="hover:text-blue-300">View</button>
+                    <button
+                      className="hover:text-blue-300 hover:cursor-pointer"
+                      onClick={() => {
+                        setSelectedCourse(course);
+                        document
+                          .getElementById("view_course_modal")
+                          .showModal();
+                      }}
+                    >
+                      View
+                    </button>
+
                     <button className="hover:text-blue-300">Edit</button>
                     <button className="hover:text-red-300">Delete</button>
                   </div>
@@ -153,7 +214,10 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                   {
                     label: "View",
                     className: "text-blue-400 text-sm",
-                    onClick: () => console.log("View", course),
+                    onClick: () => {
+                      setSelectedCourse(course);
+                      document.getElementById("view_course_modal").showModal();
+                    },
                   },
                   {
                     label: "Edit",
@@ -171,6 +235,18 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
           </div>
         </div>
       </div>
+      <FormModal
+        id="add_course_modal"
+        title="Add Course"
+        fields={courseFields}
+        onSave={handleAddCourse}
+      />
+      <ViewModal
+        id="view_course_modal"
+        title="Course"
+        fields={courseFields}
+        data={selectedCourse}
+      />
     </div>
   );
 };

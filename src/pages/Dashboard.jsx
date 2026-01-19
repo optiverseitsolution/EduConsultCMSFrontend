@@ -6,17 +6,16 @@ import { Outlet, useLocation } from "react-router-dom";
 
 const Dashboard = () => {
   const location = useLocation();
-
   const isDashboardHome = location.pathname === "/";
 
   return (
-    <div className="flex  min-h-screen">
+    <div className="flex min-h-screen">
       <Sidebar />
 
-      <main className="flex-1 p-6 bg-black">
+      <main className="flex-1 min-w-0 p-4 sm:p-6">
         {isDashboardHome ? (
           <>
-            <h1 className="text-2xl text-white font-bold">Dashboard</h1>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
             <p className="text-gray-400 mb-6">
               Welcome back! Here's your overview.
             </p>

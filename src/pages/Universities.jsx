@@ -3,6 +3,10 @@ import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import oxford from "../assets/logos/oxford.png";
 import MobileCard from "../components/MobileCard";
+import { Plus } from "lucide-react";
+import FormModal from "../components/modal/FormModal";
+import ViewModal from "../components/modal/ViewModal";
+import SeacrhModal from "../components/modal/SeacrhModal";
 
 const Universities = () => {
   const [universities, setUniversities] = useState([
@@ -53,52 +57,105 @@ const Universities = () => {
     "Actions",
   ];
 
+  const uniFields = [
+    {
+      name: "logo",
+      label: "Logo",
+      type: "file",
+    },
+    {
+      name: "name",
+      label: "University Name",
+      placeholder: "Stanford University",
+    },
+    {
+      name: "country",
+      label: "Country",
+      type: "select",
+      options: ["USA", "UK", "Australia", "Canada"],
+    },
+    { name: "city", label: "City", placeholder: "Stanford" },
+    {
+      name: "partnerType",
+      label: "Partner Type",
+      type: "select",
+      options: ["Partner", "Non-Partner"],
+    },
+    {
+      name: "programs",
+      label: "Number of Programs",
+      type: "number",
+      placeholder: "52",
+      min: "0",
+    },
+    {
+      name: "applicationFee",
+      label: "Application Fee ($)",
+      type: "number",
+      placeholder: "75",
+      min: "0",
+    },
+    {
+      name: "status",
+      label: "Status",
+      type: "select",
+      options: ["Active", "Inactive"],
+    },
+  ];
+
+  const handleAddUni = (newUni) => {
+    setUniversities((prev) => [
+      ...prev,
+      {
+        id: prev.lenghth + 1,
+        status: "Active",
+        ...newUni,
+      },
+    ]);
+  };
+
+  const [selectedUni, setSelectedUni] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredUni = universities.filter((uni) =>
+    Object.values(uni).join(" ").toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl text-white font-bold">
-            Universities / Programs
-          </h1>
+          <h1 className="text-2xl font-bold">Universities / Programs</h1>
           <p className="text-gray-400">
             Manage partner and non-partner institutions
           </p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto">
-          + Add University
+        <button
+          onClick={() => document.getElementById("add_uni_modal").showModal()}
+          className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto hover:cursor-pointer"
+        >
+          <Plus size={18} /> Add University
         </button>
       </div>
 
-      <div className="bg-[#0B0F14] rounded-lg p-4 sm:p-6">
-        <h2 className="text-lg text-white font-semibold mb-2">
-          All Universities
-        </h2>
+      <div className="rounded-lg p-4 sm:p-6 border border-gray-400">
+        <h2 className="text-lg font-semibold mb-2">All Universities</h2>
         <p className="text-gray-400 text-sm mb-4">
           View and manage university partnerships
         </p>
         {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-
-            <input
-              type="text"
-              placeholder="Search universities..."
-              className="w-full bg-[#0B0F14] text-white pl-10 pr-2 py-2 rounded-lg 
-border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-        </div>
+        <SeacrhModal
+          placeholder="universities"
+          value={search}
+          onChange={setSearch}
+        />
         {/* Table */}
         <div className="overflow-x-auto">
           <Table
             headers={headers}
-            data={universities}
+            data={filteredUni}
             renderRow={(university) => (
-              <tr
-                key={university.id}
-                className="border-b border-gray-700 hover:bg-gray-800"
-              >
+              <tr key={university.id} className="border-b border-gray-700">
                 <td className="px-2 sm:px-4 ">
                   <img
                     src={university.logo}
@@ -117,11 +174,11 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                 </td>
                 <td className="px-2 sm:px-4 py-4">
                   {university.partnerType === "Partner" ? (
-                    <p className="bg-blue-600 rounded-lg w-fit px-3 py-1 text-xs">
+                    <p className="bg-blue-600 rounded-lg w-fit px-3 py-1 text-xs text-white">
                       {university.partnerType}
                     </p>
                   ) : (
-                    <p className="bg-gray-600 rounded-lg w-fit px-3 py-1 text-xs">
+                    <p className="bg-gray-600 rounded-lg w-fit px-3 py-1 text-xs text-white">
                       {university.partnerType}
                     </p>
                   )}
@@ -140,7 +197,15 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                 </td>
                 <td className="px-2 sm:px-4 py-4">
                   <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
-                    <button className="hover:text-blue-300">View</button>
+                    <button
+                      className="hover:text-blue-300 hover:cursor-pointer"
+                      onClick={() => {
+                        setSelectedUni(university);
+                        document.getElementById("view_uni_modal").showModal();
+                      }}
+                    >
+                      View
+                    </button>
                     <button className="hover:text-blue-300">Edit</button>
                     <button className="hover:text-red-300">Delete</button>
                   </div>
@@ -178,7 +243,10 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                   {
                     label: "View",
                     className: "text-blue-400 text-sm",
-                    onClick: () => console.log("View", uni),
+                    onClick: () => {
+                      setSelectedUni(uni);
+                      document.getElementById("view_uni_modal").showModal();
+                    },
                   },
                   {
                     label: "Edit",
@@ -196,6 +264,18 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
           </div>
         </div>
       </div>
+      <FormModal
+        id="add_uni_modal"
+        title="Add University"
+        fields={uniFields}
+        onSave={handleAddUni}
+      />
+      <ViewModal
+        id="view_uni_modal"
+        title="University Details"
+        fields={uniFields}
+        data={selectedUni}
+      />
     </div>
   );
 };

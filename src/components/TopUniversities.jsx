@@ -6,33 +6,28 @@ const universities = [
 ];
 
 const TopUniversities = () => {
-  const max = Math.max(...universities.map(u => u.count));
-
   return (
-    <div className="card bg-base-200 shadow-sm">
-      <div className="card-body p-5">
-        <h3 className="card-title text-base">
+    <div className="rounded-xl border border-gray-800 bg-base-200/60">
+      <div className="p-5 sm:p-6">
+        {/* Title */}
+        <h3 className="text-base font-semibold mb-4">
           Top Universities
         </h3>
 
-        <ul className="space-y-4">
+        {/* List */}
+        <ul className="divide-y divide-gray-800">
           {universities.map((u, i) => (
-            <li key={i}>
-              <div className="flex justify-between items-center mb-1">
-                <span className="font-medium">
-                  {u.name}
-                </span>
-                <span className="text-sm opacity-70">
-                  {u.count}
-                </span>
-              </div>
+            <li
+              key={i}
+              className="flex items-center justify-between py-3"
+            >
+              <span className="text-sm font-medium truncate">
+                {u.name}
+              </span>
 
-              {/* Progress bar */}
-              <progress
-                className="progress progress-primary w-full"
-                value={u.count}
-                max={max}
-              />
+              <span className="text-sm text-gray-400 whitespace-nowrap">
+                {u.count} applications
+              </span>
             </li>
           ))}
         </ul>

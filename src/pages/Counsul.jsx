@@ -1,113 +1,214 @@
-import { Plus, Search } from "lucide-react";
-import Sidebar from "../components/SideBar";
-
-const counselors = [
-  { id: 1, name: "John Doe", email: "john.counselor@example.com", countries: "UK, USA", status: "Available" },
-  { id: 2, name: "Jane Smith", email: "jane.counselor@example.com", countries: "Australia, Canada", status: "Busy" },
-  { id: 3, name: "Mike Johnson", email: "mike.counselor@example.com", countries: "Japan, South Korea", status: "Available" },
-];
+import React, { useState } from "react";
+import { Plus } from "lucide-react";
+import { FaSearch } from "react-icons/fa";
+import Table from "../components/Table";
+import MobileCard from "../components/MobileCard";
+import FormModal from "../components/modal/FormModal";
 
 const Counselors = () => {
+  const [counselors, setCounselors] = useState([
+    {
+      id: 1,
+      name: "John Doe",
+      email: "john.counselor@example.com",
+      countries: "UK, USA",
+      status: "Available",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      email: "jane.counselor@example.com",
+      countries: "Australia, Canada",
+      status: "Busy",
+    },
+    {
+      id: 3,
+      name: "Mike Johnson",
+      email: "mike.counselor@example.com",
+      countries: "Japan, South Korea",
+      status: "Available",
+    },
+  ]);
+
+  const headers = [
+    "S.N.",
+    "Counselor",
+    "Email",
+    "Counseling Countries",
+    "Status",
+    "Actions",
+  ];
+
+  /** 🔹 Modal Fields */
+  const counselorFields = [
+    {
+      name: "name",
+      label: "Counselor Name",
+      placeholder: "John Doe",
+    },
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "john@example.com",
+    },
+    {
+      name: "countries",
+      label: "Counseling Countries",
+      placeholder: "UK, USA",
+    },
+    {
+      name: "status",
+      label: "Status",
+      type: "select",
+      options: ["Available", "Busy"],
+    },
+  ];
+
+  /** 🔹 Add Counselor */
+  const handleAddCounselor = (newCounselor) => {
+    setCounselors((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        ...newCounselor,
+      },
+    ]);
+  };
+
   return (
-    <div className="flex min-h-screen ">
-      <Sidebar />
-
-      <main className="flex-1 p-8">
-        {/* Page Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold ">Counselors</h1>
-            <p className="text-gray-400 text-sm mt-1">
-              Manage counselor assignments and availability
-            </p>
-          </div>
-
-          <button className="btn btn-primary bg-[#1d4ed8] hover:bg-blue-700 border-none  normal-case rounded-lg px-6">
-            <Plus size={18} className="mr-1" /> Add Counselor
-          </button>
+    <div className="flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Counselors</h1>
+          <p className="text-gray-400">
+            Manage counselor assignments and availability
+          </p>
         </div>
 
-        {/* Main Content Card */}
-        <div className=" rounded-xl border border-gray-700 p-8">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold ">All Counselors</h2>
-            <p className="text-gray-400 text-sm">
-              View and manage all counselors and their assignments
-            </p>
-          </div>
+        <button
+          onClick={() =>
+            document.getElementById("add_counselor_modal").showModal()
+          }
+          className="flex gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
+        >
+          <Plus size={18} /> Add Counselor
+        </button>
+      </div>
 
-          {/* Search Bar */}
-          <div className="relative mb-8">
-            <Search
-              size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 "
-            />
+      {/* Content Card */}
+      <div className="rounded-lg p-4 sm:p-6 border border-gray-400">
+        <h2 className="text-lg font-semibold mb-2">All Counselors</h2>
+        <p className="text-gray-400 text-sm mb-4">
+          View and manage all counselors and their assignments
+        </p>
+
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search counselors..."
-              className="input w-full pl-12 bg-transparent border-gray-700 focus:border-blue-500 transition-all text-sm"
+              className="w-full pl-10 pr-2 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-blue-500"
             />
           </div>
+        </div>
 
-          {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="table w-full border-none">
-              <thead className=" border-none">
-                <tr className="border-none text-[13px] uppercase tracking-wider">
-                  <th className="bg-transparent pl-0 font-medium">S.N.</th>
-                  <th className="bg-transparent font-medium">Counselor</th>
-                  <th className="bg-transparent font-medium">Email</th>
-                  <th className="bg-transparent font-medium text-center">Counseling Country</th>
-                  <th className="bg-transparent font-medium text-center">Status</th>
-                  <th className="bg-transparent text-right pr-0 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                {counselors.map((c, index) => (
-                  <tr key={c.id} className="border-none hover:bg-white/5 transition-colors group">
-                    <td className="pl-0 ">{index + 1}</td>
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <Table
+            headers={headers}
+            data={counselors}
+            renderRow={(c, index) => (
+              <tr
+                key={c.id}
+                className="border-b border-gray-700 hover:bg-gray-800"
+              >
+                <td className="px-2 sm:px-4 py-4">{index + 1}</td>
 
-                    <td className="py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="avatar">
-                          <div className="w-9 rounded-full ">
-                             {/* Placeholder for the person icon shown in your image */}
-                            <img src={`https://ui-avatars.com/api/?name=${c.name}&background=fdba74&color=7c2d12`} alt="avatar" />
-                          </div>
-                        </div>
-                        <span className="font-semibold ">{c.name}</span>
-                      </div>
-                    </td>
+                <td className="px-2 sm:px-4 py-4">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${c.name}`}
+                      alt={c.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <span>{c.name}</span>
+                  </div>
+                </td>
 
-                    <td className="">{c.email}</td>
-                    <td className="text-center ">{c.countries}</td>
+                <td className="px-2 sm:px-4 py-4">{c.email}</td>
 
-                    <td className="text-center">
-                      <span
-                        className={`badge border-none py-3 px-4 text-xs font-semibold rounded-md ${
-                          c.status === "Available"
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-700 text-gray-300"
-                        }`}
-                      >
-                        {c.status}
-                      </span>
-                    </td>
+                <td className="px-2 sm:px-4 py-4 text-center">
+                  {c.countries}
+                </td>
 
-                    <td className="text-right pr-0">
-                      <div className="flex items-center justify-start gap-5">
-                        <button className="   font-medium">View</button>
-                        <button className="   font-medium">Edit</button>
-                        <button className="   font-medium">Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                <td className="px-2 sm:px-4 py-4 text-center">
+                  <span
+                    className={`px-3 py-1 rounded-lg text-xs ${
+                      c.status === "Available"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-600 text-gray-200"
+                    }`}
+                  >
+                    {c.status}
+                  </span>
+                </td>
+
+                <td className="px-2 sm:px-4 py-4">
+                  <div className="flex gap-3 text-sm">
+                    <button className="hover:text-blue-300">View</button>
+                    <button className="hover:text-blue-300">Edit</button>
+                    <button className="hover:text-red-300">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            )}
+          />
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {counselors.map((c) => (
+              <MobileCard
+                key={c.id}
+                title={c.name}
+                fields={[
+                  { label: "Email", value: c.email },
+                  { label: "Countries", value: c.countries },
+                  { label: "Status", value: c.status },
+                ]}
+                actions={[
+                  {
+                    label: "View",
+                    className: "text-blue-400 text-sm",
+                    onClick: () => console.log("View", c),
+                  },
+                  {
+                    label: "Edit",
+                    className: "text-blue-400 text-sm",
+                    onClick: () => console.log("Edit", c),
+                  },
+                  {
+                    label: "Delete",
+                    className: "text-red-400 text-sm",
+                    onClick: () => console.log("Delete", c),
+                  },
+                ]}
+              />
+            ))}
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* 🔹 Add Counselor Modal */}
+      <FormModal
+        id="add_counselor_modal"
+        title="Add Counselor"
+        fields={counselorFields}
+        onSave={handleAddCounselor}
+      />
     </div>
   );
 };

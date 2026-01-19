@@ -14,16 +14,41 @@ import { FaMoon, FaSun } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
-  // for new components added please add the path directly here as well as in App.jsx
+  // Add new routes here AND in App.jsx
   const navItems = [
     { id: "dashboard", label: "Dashboard", path: "/", icon: LayoutDashboard },
-    { id: "users-roles", label: "Users & Roles", path: "/", icon: Shield },
-    { id: "students", label: "Students", path: "/", icon: GraduationCap },
+    {
+      id: "users-roles",
+      label: "Users & Roles",
+      path: "/userrole",
+      icon: Shield,
+    },
+    {
+      id: "students",
+      label: "Students",
+      path: "/student",
+      icon: GraduationCap,
+    },
     { id: "courses", label: "Courses", path: "/courses", icon: BookOpen },
-    { id: "universities", label: "Universities", path: "/universities", icon: Building2 },
-    { id: "counselors", label: "Counselors", path: "/Counselor", icon: UserCog },
-    { id: "consultancy", label: "Consultancy", path: "/", icon: Briefcase },
-    { id: "fees", label: "Fee Structure", path: "/", icon: DollarSign },
+    {
+      id: "universities",
+      label: "Universities",
+      path: "/universities",
+      icon: Building2,
+    },
+    {
+      id: "counselors",
+      label: "Counselors",
+      path: "/counselor",
+      icon: UserCog,
+    },
+    {
+      id: "consultancy",
+      label: "Consultancy",
+      path: "/consultancy",
+      icon: Briefcase,
+    },
+    { id: "fees", label: "Fee Structure", path: "/fee", icon: DollarSign },
   ];
 
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -34,7 +59,7 @@ const Sidebar = () => {
   }, [theme]);
 
   const linkClass = ({ isActive }) =>
-    `btn btn-block md:justify-start justify-center gap-3 ${
+    `btn btn-block md:justify-start justify-center gap-3 hover:bg-green-600 ${
       isActive ? "bg-blue-600 text-white" : "btn-ghost"
     }`;
 
@@ -46,7 +71,7 @@ const Sidebar = () => {
           <div className="p-2 bg-blue-600 rounded-lg text-white">
             <GraduationCap size={32} />
           </div>
-          <h1 className="hidden md:flex text-xl font-bold items-center justify-center text-center">
+          <h1 className="hidden md:flex text-xl font-bold text-center">
             EduConsult CMS
           </h1>
         </div>
@@ -56,7 +81,12 @@ const Sidebar = () => {
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
-              <NavLink key={item.id} to={item.path} className={linkClass} end={item.path === "/"}>
+              <NavLink
+                key={item.id}
+                to={item.path}
+                className={linkClass}
+                end={item.path === "/"}
+              >
                 <Icon />
                 <span className="hidden md:inline">{item.label}</span>
               </NavLink>
