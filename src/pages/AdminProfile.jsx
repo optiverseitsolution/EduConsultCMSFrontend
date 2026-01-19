@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Pencil, X } from "lucide-react";
 import admin from "../assets/admin.jpg";
 
 const AdminProfile = () => {
   const [editMode, setEditMode] = useState(false);
+  const [editImg, setEditImg] = useState(false);
   const [errors, setErrors] = useState({});
+  const fileInputRef = useRef(null);
+  const [preview, setPreview] = useState(admin);
 
   const [profile, setProfile] = useState({
     fullname: "Admin User",
@@ -45,6 +48,22 @@ const AdminProfile = () => {
     setEditMode(false);
   };
 
+  const handleClick = () => {
+    fileInputRef.current.click();
+  };
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image");
+      return;
+    }
+
+    const imageURL = URL.createObjectURL(file);
+    setPreview(imageURL);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -54,15 +73,34 @@ const AdminProfile = () => {
         </p>
       </div>
 
-      <div className="flex justify-between items-center p-6 bg-base-300 border border-base-content/20 rounded-xl">
-        <div className="flex items-center gap-4">
-          <img
-            src={admin}
-            alt="Admin"
-            className="w-28 h-28 rounded-full border-4 border-base-content/10"
-          />
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 p-6 bg-base-300 border border-base-content/20 rounded-xl">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+          <div
+            className="flex relative"
+            onMouseEnter={() => setEditImg(true)}
+            onMouseLeave={() => setEditImg(false)}
+            onClick={handleClick}
+          >
+            <img
+              src={preview}
+              alt="Admin"
+              className="md:w-28 h-28 rounded-full border-4 border-base-content/10"
+            />
+            {editImg && (
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white font-medium cursor-pointer">
+                Choose Photo
+              </div>
+            )}
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+          </div>
 
-          <div>
+          <div className="flex flex-col items-center sm:items-start">
             <h2 className="text-2xl font-bold">{profile.fullname}</h2>
             <p className="text-gray-400">Role: Super Admin</p>
             <p className="text-gray-400">Email: {profile.email}</p>
@@ -88,7 +126,7 @@ const AdminProfile = () => {
       {/* Edit Admin Profile */}
       {editMode && (
         <div className="bg-base-300 border border-base-content/20 rounded-xl p-6">
-          <div className="flex flex-col gap-6 w-1/2">
+          <div className="flex flex-col gap-6 w-full sm:w-1/2">
             <div>
               <label className="label">
                 <span className="label-text font-medium">Full Name</span>
@@ -141,16 +179,21 @@ const AdminProfile = () => {
               <label className="label">
                 <span className="label-text font-medium">Security</span>
               </label>
-              <button className="btn btn-outline w-fit">Change Password</button>
+              <button className="btn btn-outline w-fit max-sm:w-full">
+                Change Password
+              </button>
             </div>
           </div>
 
-          <div className="mt-6">
-            <button className="btn bg-blue-600" onClick={handleSave}>
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+            <button
+              className="btn bg-blue-600 w-full sm:w-auto"
+              onClick={handleSave}
+            >
               Save Changes
             </button>
             <button
-              className="btn btn-ghost"
+              className="btn btn-ghost w-full sm:w-auto"
               onClick={() => setEditMode(false)}
             >
               Cancel
