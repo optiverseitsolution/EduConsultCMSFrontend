@@ -129,7 +129,7 @@ const FeeStructure = () => {
             renderRow={(fee) => (
               <tr
                 key={fee.id}
-                className="border-b border-gray-700 hover:bg-gray-800"
+                className="border-b border-gray-700 hover:bg-base-300"
               >
                 <td className="px-4 py-4">{fee.id}</td>
                 <td className="px-4 py-4">{fee.consultancy}</td>

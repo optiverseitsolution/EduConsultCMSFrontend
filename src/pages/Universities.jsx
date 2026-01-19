@@ -153,7 +153,7 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
             renderRow={(university) => (
               <tr
                 key={university.id}
-                className="border-b border-gray-700 hover:bg-gray-800"
+                className="border-b border-gray-700 hover:bg-base-300"
               >
                 <td className="px-2 sm:px-4 ">
                   <img

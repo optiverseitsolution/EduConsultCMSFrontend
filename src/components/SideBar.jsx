@@ -17,12 +17,37 @@ const Sidebar = () => {
   // Add new routes here AND in App.jsx
   const navItems = [
     { id: "dashboard", label: "Dashboard", path: "/", icon: LayoutDashboard },
-    { id: "users-roles", label: "Users & Roles", path: "/userrole", icon: Shield },
-    { id: "students", label: "Students", path: "/student", icon: GraduationCap },
+    {
+      id: "users-roles",
+      label: "Users & Roles",
+      path: "/userrole",
+      icon: Shield,
+    },
+    {
+      id: "students",
+      label: "Students",
+      path: "/student",
+      icon: GraduationCap,
+    },
     { id: "courses", label: "Courses", path: "/courses", icon: BookOpen },
-    { id: "universities", label: "Universities", path: "/universities", icon: Building2 },
-    { id: "counselors", label: "Counselors", path: "/counselor", icon: UserCog },
-    { id: "consultancy", label: "Consultancy", path: "/consultancy", icon: Briefcase },
+    {
+      id: "universities",
+      label: "Universities",
+      path: "/universities",
+      icon: Building2,
+    },
+    {
+      id: "counselors",
+      label: "Counselors",
+      path: "/counselor",
+      icon: UserCog,
+    },
+    {
+      id: "consultancy",
+      label: "Consultancy",
+      path: "/consultancy",
+      icon: Briefcase,
+    },
     { id: "fees", label: "Fee Structure", path: "/fee", icon: DollarSign },
   ];
 
@@ -73,17 +98,35 @@ const Sidebar = () => {
       {/* Footer */}
       <div className="space-y-4">
         {/* Theme Toggle */}
-        <label className="swap swap-rotate self-center md:self-start px-3">
-          <input
-            type="checkbox"
-            checked={theme === "dark"}
-            onChange={() =>
-              setTheme(theme === "light" ? "dark" : "light")
-            }
-          />
-          <FaSun className="swap-off text-xl" />
-          <FaMoon className="swap-on text-xl" />
-        </label>
+        {/* Theme Toggle */}
+        <div className="mx-2 mb-2">
+          <div
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            className="flex items-center justify-center md:justify-between gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-base-200 transition"
+          >
+            {/* Left: Icon + Label */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-base-200">
+                {theme === "light" ? <FaMoon size={14} /> : <FaSun size={14} />}
+              </div>
+              <span className="hidden md:inline text-sm font-medium">
+                Theme
+              </span>
+            </div>
+
+            {/* Right: Switch */}
+            <div
+              className={`relative w-10 h-5 rounded-full transition-colors
+        ${theme === "dark" ? "bg-blue-600" : "bg-gray-400"}`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow
+          transition-transform
+          ${theme === "dark" ? "translate-x-5" : "translate-x-0"}`}
+              />
+            </div>
+          </div>
+        </div>
 
         {/* User Info */}
         <div className="flex items-center justify-center md:justify-start gap-3 p-3 border-t border-gray-700 bg-base-200/50">

@@ -124,7 +124,7 @@ const UsersRoles = () => {
             headers={headers}
             data={users}
             renderRow={(u, index) => (
-              <tr key={u.id} className="border-b border-gray-700">
+              <tr key={u.id} className="border-b border-gray-700 hover:bg-base-300">
                 <td className="px-2 sm:px-4 py-4">{index + 1}</td>
 
                 <td className="px-2 sm:px-4 py-4">
