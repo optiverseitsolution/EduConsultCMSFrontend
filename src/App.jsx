@@ -8,6 +8,7 @@ import UsersRoles from "./pages/UsersRoles.jsx";
 import Students from "./pages/Student.jsx";
 import Consultancy from "./pages/Consultancy.jsx";
 import FeeStructure from "./pages/FeeStructure.jsx";
+import AdminProfile from "./pages/AdminProfile.jsx";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="counselor" element={<Counselors />} />
         <Route path="consultancy" element={<Consultancy />} />
         <Route path="fee" element={<FeeStructure />} />
+        <Route path="admin-profile" element={<AdminProfile />} />
       </Route>
     </Routes>
   );
