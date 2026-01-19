@@ -4,6 +4,7 @@ import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
 import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
+import SeacrhModal from "../components/modal/SeacrhModal";
 
 const FeeStructure = () => {
   const [fees, setFees] = useState([
@@ -67,6 +68,7 @@ const FeeStructure = () => {
       label: "Amount",
       type: "number",
       placeholder: "150",
+      min: "0",
     },
     {
       name: "currency",
@@ -86,6 +88,12 @@ const FeeStructure = () => {
     ]);
   };
 
+  const [search, setSearch] = useState("");
+
+  const filteredFee = fees.filter((fee) =>
+    Object.values(fee).join(" ").toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="flex flex-col gap-6 ">
       {/* Header */}
@@ -96,36 +104,24 @@ const FeeStructure = () => {
         </div>
         <button
           onClick={() => document.getElementById("add_fee_modal").showModal()}
-          className="flex gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
+          className="flex gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto hover:cursor-pointer"
         >
           <Plus size={18} /> Add Fee
         </button>
       </div>
 
-      {/* Table Section */}
       <div className=" rounded-lg p-4 sm:p-6 border border-gray-400">
         <h2 className="text-lg font-semibold mb-2">All Fees</h2>
         <p className="text-gray-400 text-sm mb-4">
           View and manage all fee structures
         </p>
 
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search fees..."
-              className="w-full  pl-10 pr-2 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-        </div>
+        <SeacrhModal placeholder="fees" onChange={setSearch} value={search} />
 
-        {/* Desktop Table */}
         <div className="overflow-x-auto hidden md:block">
           <Table
             headers={headers}
-            data={fees}
+            data={filteredFee}
             renderRow={(fee) => (
               <tr
                 key={fee.id}

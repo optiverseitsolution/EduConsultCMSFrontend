@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
@@ -39,13 +39,11 @@ const UsersRoles = () => {
     },
   ]);
 
-  /** 🔹 Modal Fields */
+  const [query, setQuery] = useState("");
+
+  /** Modal Fields */
   const userFields = [
-    {
-      name: "name",
-      label: "Full Name",
-      placeholder: "John Doe",
-    },
+    { name: "name", label: "Full Name", placeholder: "John Doe" },
     {
       name: "email",
       label: "Email",
@@ -66,15 +64,30 @@ const UsersRoles = () => {
     },
   ];
 
-  /** 🔹 Add User */
+  /** Add User */
   const handleAddUser = (newUser) => {
     setUsers((prev) => [
       ...prev,
       {
-        id: prev.length + 1,
+        id: prev.length ? Math.max(...prev.map((u) => u.id)) + 1 : 1,
         ...newUser,
       },
     ]);
+  };
+
+  const filteredUsers = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return users;
+
+    return users.filter((u) => {
+      const haystack = `${u.name} ${u.email} ${u.role} ${u.status}`.toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [users, query]);
+
+  const openAddModal = () => {
+    const el = document.getElementById("add_user_modal");
+    if (el?.showModal) el.showModal();
   };
 
   return (
@@ -89,9 +102,7 @@ const UsersRoles = () => {
         </div>
 
         <button
-          onClick={() =>
-            document.getElementById("add_user_modal").showModal()
-          }
+          onClick={openAddModal}
           className="flex gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
         >
           <Plus size={18} />
@@ -112,17 +123,19 @@ const UsersRoles = () => {
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Search users..."
               className="w-full pl-10 pr-2 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-blue-500"
             />
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <Table
             headers={headers}
-            data={users}
+            data={filteredUsers}
             renderRow={(u, index) => (
               <tr key={u.id} className="border-b border-gray-700">
                 <td className="px-2 sm:px-4 py-4">{index + 1}</td>
@@ -130,7 +143,9 @@ const UsersRoles = () => {
                 <td className="px-2 sm:px-4 py-4">
                   <div className="flex items-center gap-3">
                     <img
-                      src={`https://ui-avatars.com/api/?name=${u.name}`}
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        u.name
+                      )}`}
                       alt={u.name}
                       className="w-8 h-8 rounded-full"
                     />
@@ -160,50 +175,69 @@ const UsersRoles = () => {
 
                 <td className="px-2 sm:px-4 py-4">
                   <div className="flex gap-3 text-sm">
-                    <button className="hover:text-blue-300">View</button>
-                    <button className="hover:text-blue-300">Edit</button>
-                    <button className="hover:text-red-300">Delete</button>
+                    <button
+                      className="hover:text-blue-300"
+                      onClick={() => console.log("View", u)}
+                    >
+                      View
+                    </button>
+                    <button
+                      className="hover:text-blue-300"
+                      onClick={() => console.log("Edit", u)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="hover:text-red-300"
+                      onClick={() => console.log("Delete", u)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
             )}
           />
+        </div>
 
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-4">
-            {users.map((u) => (
-              <MobileCard
-                key={u.id}
-                title={u.name}
-                fields={[
-                  { label: "Email", value: u.email },
-                  { label: "Role", value: u.role },
-                  { label: "Status", value: u.status },
-                ]}
-                actions={[
-                  {
-                    label: "View",
-                    className: "text-blue-400 text-sm",
-                    onClick: () => console.log("View", u),
-                  },
-                  {
-                    label: "Edit",
-                    className: "text-blue-400 text-sm",
-                    onClick: () => console.log("Edit", u),
-                  },
-                  {
-                    label: "Delete",
-                    className: "text-red-400 text-sm",
-                    onClick: () => console.log("Delete", u),
-                  },
-                ]}
-              />
-            ))}
-          </div>
+        {/* Mobile Cards */}
+        <div className="md:hidden space-y-4">
+          {filteredUsers.map((u) => (
+            <MobileCard
+              key={u.id}
+              title={u.name}
+              fields={[
+                { label: "Email", value: u.email },
+                { label: "Role", value: u.role },
+                { label: "Status", value: u.status },
+              ]}
+              actions={[
+                {
+                  label: "View",
+                  className: "text-blue-400 text-sm",
+                  onClick: () => console.log("View", u),
+                },
+                {
+                  label: "Edit",
+                  className: "text-blue-400 text-sm",
+                  onClick: () => console.log("Edit", u),
+                },
+                {
+                  label: "Delete",
+                  className: "text-red-400 text-sm",
+                  onClick: () => console.log("Delete", u),
+                },
+              ]}
+            />
+          ))}
+
+          {filteredUsers.length === 0 && (
+            <div className="text-gray-400 text-sm">No users found.</div>
+          )}
         </div>
       </div>
 
-      {/* 🔹 Add User Modal */}
+      {/* Add User Modal */}
       <FormModal
         id="add_user_modal"
         title="Add User"

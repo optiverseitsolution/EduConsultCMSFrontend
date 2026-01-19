@@ -17,12 +17,37 @@ const Sidebar = () => {
   // Add new routes here AND in App.jsx
   const navItems = [
     { id: "dashboard", label: "Dashboard", path: "/", icon: LayoutDashboard },
-    { id: "users-roles", label: "Users & Roles", path: "/userrole", icon: Shield },
-    { id: "students", label: "Students", path: "/student", icon: GraduationCap },
+    {
+      id: "users-roles",
+      label: "Users & Roles",
+      path: "/userrole",
+      icon: Shield,
+    },
+    {
+      id: "students",
+      label: "Students",
+      path: "/student",
+      icon: GraduationCap,
+    },
     { id: "courses", label: "Courses", path: "/courses", icon: BookOpen },
-    { id: "universities", label: "Universities", path: "/universities", icon: Building2 },
-    { id: "counselors", label: "Counselors", path: "/counselor", icon: UserCog },
-    { id: "consultancy", label: "Consultancy", path: "/consultancy", icon: Briefcase },
+    {
+      id: "universities",
+      label: "Universities",
+      path: "/universities",
+      icon: Building2,
+    },
+    {
+      id: "counselors",
+      label: "Counselors",
+      path: "/counselor",
+      icon: UserCog,
+    },
+    {
+      id: "consultancy",
+      label: "Consultancy",
+      path: "/consultancy",
+      icon: Briefcase,
+    },
     { id: "fees", label: "Fee Structure", path: "/fee", icon: DollarSign },
   ];
 
@@ -34,7 +59,7 @@ const Sidebar = () => {
   }, [theme]);
 
   const linkClass = ({ isActive }) =>
-    `btn btn-block md:justify-start justify-center gap-3 ${
+    `btn btn-block md:justify-start justify-center gap-3 hover:bg-green-600 ${
       isActive ? "bg-blue-600 text-white" : "btn-ghost"
     }`;
 
@@ -77,9 +102,7 @@ const Sidebar = () => {
           <input
             type="checkbox"
             checked={theme === "dark"}
-            onChange={() =>
-              setTheme(theme === "light" ? "dark" : "light")
-            }
+            onChange={() => setTheme(theme === "light" ? "dark" : "light")}
           />
           <FaSun className="swap-off text-xl" />
           <FaMoon className="swap-on text-xl" />
