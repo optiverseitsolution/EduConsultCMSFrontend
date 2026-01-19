@@ -98,7 +98,6 @@ const Sidebar = () => {
       {/* Footer */}
       <div className="space-y-4">
         {/* Theme Toggle */}
-<<<<<<< HEAD
         {/* Theme Toggle */}
         <div className="mx-2 mb-2">
           <div
@@ -128,17 +127,6 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-=======
-        <label className="swap swap-rotate self-center md:self-start px-3">
-          <input
-            type="checkbox"
-            checked={theme === "dark"}
-            onChange={() => setTheme(theme === "light" ? "dark" : "light")}
-          />
-          <FaSun className="swap-off text-xl" />
-          <FaMoon className="swap-on text-xl" />
-        </label>
->>>>>>> dev
 
         {/* User Info */}
         <div className="flex items-center justify-center md:justify-start gap-3 p-3 border-t border-gray-700 bg-base-200/50">

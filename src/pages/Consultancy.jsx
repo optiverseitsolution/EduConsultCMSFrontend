@@ -159,14 +159,10 @@ const Consultancy = () => {
             headers={headers}
             data={filteredConsultancy}
             renderRow={(c) => (
-<<<<<<< HEAD
               <tr
                 key={c.id}
                 className="border-b border-gray-700 hover:bg-base-300"
               >
-=======
-              <tr key={c.id} className="border-b border-gray-700 ">
->>>>>>> dev
                 <td className="px-2 sm:px-4 ">
                   <img
                     src={c.logo}
