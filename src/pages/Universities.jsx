@@ -5,6 +5,8 @@ import oxford from "../assets/logos/oxford.png";
 import MobileCard from "../components/MobileCard";
 import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
+import ViewModal from "../components/modal/ViewModal";
+import SeacrhModal from "../components/modal/SeacrhModal";
 
 const Universities = () => {
   const [universities, setUniversities] = useState([
@@ -84,12 +86,14 @@ const Universities = () => {
       label: "Number of Programs",
       type: "number",
       placeholder: "52",
+      min: "0",
     },
     {
       name: "applicationFee",
       label: "Application Fee ($)",
       type: "number",
       placeholder: "75",
+      min: "0",
     },
     {
       name: "status",
@@ -110,6 +114,13 @@ const Universities = () => {
     ]);
   };
 
+  const [selectedUni, setSelectedUni] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredUni = universities.filter((uni) =>
+    Object.values(uni).join(" ").toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -121,7 +132,7 @@ const Universities = () => {
         </div>
         <button
           onClick={() => document.getElementById("add_uni_modal").showModal()}
-          className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
+          className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto hover:cursor-pointer"
         >
           <Plus size={18} /> Add University
         </button>
@@ -133,28 +144,25 @@ const Universities = () => {
           View and manage university partnerships
         </p>
         {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-
-            <input
-              type="text"
-              placeholder="Search universities..."
-              className="w-full pl-10 pr-2 py-2 rounded-lg 
-border border-gray-700 focus:outline-none focus:border-blue-500"
-            />
-          </div>
-        </div>
+        <SeacrhModal
+          placeholder="universities"
+          value={search}
+          onChange={setSearch}
+        />
         {/* Table */}
         <div className="overflow-x-auto">
           <Table
             headers={headers}
-            data={universities}
+            data={filteredUni}
             renderRow={(university) => (
+<<<<<<< HEAD
               <tr
                 key={university.id}
                 className="border-b border-gray-700 hover:bg-base-300"
               >
+=======
+              <tr key={university.id} className="border-b border-gray-700">
+>>>>>>> dev
                 <td className="px-2 sm:px-4 ">
                   <img
                     src={university.logo}
@@ -196,7 +204,15 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                 </td>
                 <td className="px-2 sm:px-4 py-4">
                   <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
-                    <button className="hover:text-blue-300">View</button>
+                    <button
+                      className="hover:text-blue-300 hover:cursor-pointer"
+                      onClick={() => {
+                        setSelectedUni(university);
+                        document.getElementById("view_uni_modal").showModal();
+                      }}
+                    >
+                      View
+                    </button>
                     <button className="hover:text-blue-300">Edit</button>
                     <button className="hover:text-red-300">Delete</button>
                   </div>
@@ -234,7 +250,10 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
                   {
                     label: "View",
                     className: "text-blue-400 text-sm",
-                    onClick: () => console.log("View", uni),
+                    onClick: () => {
+                      setSelectedUni(uni);
+                      document.getElementById("view_uni_modal").showModal();
+                    },
                   },
                   {
                     label: "Edit",
@@ -257,6 +276,12 @@ border border-gray-700 focus:outline-none focus:border-blue-500"
         title="Add University"
         fields={uniFields}
         onSave={handleAddUni}
+      />
+      <ViewModal
+        id="view_uni_modal"
+        title="University Details"
+        fields={uniFields}
+        data={selectedUni}
       />
     </div>
   );
