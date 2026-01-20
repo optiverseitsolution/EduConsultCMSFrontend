@@ -9,6 +9,7 @@ import Students from "./pages/Student.jsx";
 import Consultancy from "./pages/Consultancy.jsx";
 import FeeStructure from "./pages/FeeStructure.jsx";
 import AdminProfile from "./pages/AdminProfile.jsx";
+import Packages from "./pages/Packages.jsx";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="consultancy" element={<Consultancy />} />
         <Route path="fee" element={<FeeStructure />} />
         <Route path="admin-profile" element={<AdminProfile />} />
+        <Route path="packages" element={<Packages />} />
       </Route>
     </Routes>
   );

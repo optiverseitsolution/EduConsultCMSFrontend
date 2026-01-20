@@ -9,6 +9,7 @@ import {
   Shield,
   User2,
   UserCog,
+  Box,
 } from "lucide-react";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -49,6 +50,7 @@ const Sidebar = () => {
       icon: Briefcase,
     },
     { id: "fees", label: "Fee Structure", path: "/fee", icon: DollarSign },
+    { id: "packages", label: "Packages", path: "/packages", icon: Box },
   ];
 
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
