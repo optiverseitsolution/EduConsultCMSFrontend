@@ -9,9 +9,10 @@ import {
   Shield,
   User2,
   UserCog,
+  Box,
 } from "lucide-react";
 import { FaMoon, FaSun } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   // Add new routes here AND in App.jsx
@@ -49,6 +50,7 @@ const Sidebar = () => {
       icon: Briefcase,
     },
     { id: "fees", label: "Fee Structure", path: "/fee", icon: DollarSign },
+    { id: "packages", label: "Packages", path: "/packages", icon: Box },
   ];
 
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -62,6 +64,8 @@ const Sidebar = () => {
     `btn btn-block md:justify-start justify-center gap-3 hover:bg-green-600 ${
       isActive ? "bg-blue-600 text-white" : "btn-ghost"
     }`;
+
+  const navigate = useNavigate();
 
   return (
     <aside className="w-16 md:w-64 min-h-screen border-r border-gray-700 flex flex-col justify-between">
@@ -109,7 +113,10 @@ const Sidebar = () => {
         </label>
 
         {/* User Info */}
-        <div className="flex items-center justify-center md:justify-start gap-3 p-3 border-t border-gray-700 bg-base-200/50">
+        <div
+          className="flex items-center justify-center md:justify-start gap-3 p-3 border-t border-gray-700 bg-base-200/50 hover:cursor-pointer"
+          onClick={() => navigate("admin-profile")}
+        >
           <div className="p-2 rounded-full bg-primary/10 text-primary">
             <User2 size={18} />
           </div>
