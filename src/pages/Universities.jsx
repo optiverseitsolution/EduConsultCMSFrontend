@@ -155,7 +155,10 @@ const Universities = () => {
             headers={headers}
             data={filteredUni}
             renderRow={(university) => (
-              <tr key={university.id} className="border-b border-gray-700">
+              <tr
+                key={university.id}
+                className="border-b border-gray-700 hover:bg-base-300"
+              >
                 <td className="px-2 sm:px-4 ">
                   <img
                     src={university.logo}

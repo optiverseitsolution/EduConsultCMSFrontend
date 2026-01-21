@@ -81,6 +81,47 @@ const FormModal = ({ id, title, fields, onSave }) => {
                     </p>
                   )}
                 </>
+              ) : field.type === "textarea" ? (
+                <>
+                  <textarea
+                    className={`textarea textarea-bordered w-full ${
+                      errors[field.name] ? "border-red-500" : ""
+                    }`}
+                    value={formData[field.name] || ""}
+                    placeholder={field.placeholder}
+                    onChange={(e) => handleChange(field.name, e.target.value)}
+                  />
+
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[field.name]}
+                    </p>
+                  )}
+                </>
+              ) : field.type === "select" ? (
+                <>
+                  <select
+                    className={`select select-bordered w-full ${
+                      errors[field.name] ? "border-red-500" : ""
+                    }`}
+                    value={formData[field.name] || ""}
+                    onChange={(e) => handleChange(field.name, e.target.value)}
+                  >
+                    <option value="">Select {field.label}</option>
+
+                    {field.options?.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors[field.name]}
+                    </p>
+                  )}
+                </>
               ) : (
                 <>
                   <input

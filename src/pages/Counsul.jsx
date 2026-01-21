@@ -124,7 +124,7 @@ const Counselors = () => {
             renderRow={(c, index) => (
               <tr
                 key={c.id}
-                className="border-b border-gray-700 hover:bg-gray-800"
+                className="border-b border-gray-700 hover:bg-base-300"
               >
                 <td className="px-2 sm:px-4 py-4">{index + 1}</td>
 
