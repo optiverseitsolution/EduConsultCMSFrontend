@@ -6,12 +6,17 @@ import PackageFormModal from "../components/modal/PackageFormModal";
 import ViewModal from "../components/modal/ViewModal";
 import SeacrhModal from "../components/modal/SeacrhModal";
 
+//galery mock
+import g1 from "../assets/logos/abc.jpg";
+import g2 from "../assets/logos/oxford.png";
+import logo from "../assets/admin.jpg";
+
 const Packages = () => {
   const [packages, setPackages] = useState([
     {
       id: 1,
-      image: null,
-      gallery: [],
+      image: logo,
+      gallery: [g1, g2, g1],
       name: "Everest Base Camp Trek",
       difficulty: "Moderate",
       size: 10,
@@ -58,13 +63,11 @@ const Packages = () => {
       name: "image",
       label: "Featured Image Upload",
       type: "file",
-      placeholder: "",
     },
     {
       name: "gallery",
       label: "Gallery",
-      type: "file-multiple",
-      placeholder: "",
+      type: "file",
     },
     {
       name: "name",
@@ -236,12 +239,12 @@ const Packages = () => {
 
       {/* Modals */}
       <PackageFormModal id="add_package_modal" onSave={handleAddPackage} />
-      {/* <ViewModal
+      <ViewModal
         id="view_package_modal"
         title="Package"
-        feilds={packageFields}
+        fields={packageFields}
         data={selectedPackage}
-      /> */}
+      />
     </div>
   );
 };

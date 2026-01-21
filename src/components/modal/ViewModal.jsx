@@ -19,14 +19,38 @@ const ViewModal = ({ id, title, fields, data }) => {
               <p className="label font-medium">{field.label}</p>
 
               {field.type === "file" && data[field.name] ? (
-                <img
-                  src={
-                    typeof data[field.name] === "string"
-                      ? data[field.name]
-                      : URL.createObjectURL(data[field.name])
-                  }
-                  alt={field.label}
-                  className="w-16 h-16 object-cover"
+                Array.isArray(data[field.name]) ? (
+                  <div className="flex gap-2 flex-wrap">
+                    {data[field.name].map((file, i) => (
+                      <img
+                        key={i}
+                        src={
+                          typeof file === "string"
+                            ? file
+                            : URL.createObjectURL(file)
+                        }
+                        alt={`${field.label}-${i}`}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <img
+                    src={
+                      typeof data[field.name] === "string"
+                        ? data[field.name]
+                        : URL.createObjectURL(data[field.name])
+                    }
+                    alt={field.label}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                )
+              ) : field.type === "richtext" ? (
+                <div
+                  className="prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{
+                    __html: data[field.name] || "-",
+                  }}
                 />
               ) : (
                 <div>{data[field.name] ?? "-"}</div>

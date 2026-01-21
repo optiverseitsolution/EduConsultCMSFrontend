@@ -5,91 +5,119 @@ import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import TextAlign from "@tiptap/extension-text-align";
+import BulletList from "@tiptap/extension-bullet-list";
+import OrderedList from "@tiptap/extension-ordered-list";
+import React, { useRef } from "react";
+
+import {
+  Bold,
+  Italic,
+  Underline as UnderLine,
+  StrikethroughIcon,
+  CodeXml,
+  TextAlignStart,
+  TextAlignCenter,
+  TextAlignEnd,
+  AlignJustify,
+  List,
+  ListOrdered,
+  Link as LINK,
+  Image as PHOTO,
+  X,
+} from "lucide-react";
 
 const RichTextEditor = ({ value, onChange, error }) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        bulletList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false,
-        },
+        bulletList: false,
+        orderedList: false,
       }),
       Underline,
-      Link.configure({
-        openOnClick: false,
-      }),
+      Link,
       Image,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
+      BulletList,
+      OrderedList,
       Placeholder.configure({
-        placeholder: "Detailed Itinerary",
+        placeholder: "Start typing...",
+      }),
+      TextAlign.configure({
+        types: ["heading", "paragraph", "bulletList", "orderedList"],
       }),
     ],
-    content: value,
+    content: value || "<p></p>",
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      onChange?.(editor.getHTML());
     },
   });
 
   if (!editor) return null;
 
+  const imageInputRef = useRef(null);
+
   return (
-    <div>
+    <div className="border-base-300 rounded-lg border">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-1 border rounded-lg p-2 bg-base-200 mb-2">
+      <div className="flex flex-wrap items-center rounded-t-lg gap-1 p-2 bg-base-200">
         <Btn
           active={editor.isActive("bold")}
           onClick={() => editor.chain().focus().toggleBold().run()}
         >
-          B
+          <Bold />
         </Btn>
         <Btn
           active={editor.isActive("italic")}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
-          I
+          <Italic />
         </Btn>
         <Btn
           active={editor.isActive("underline")}
           onClick={() => editor.chain().focus().toggleUnderline().run()}
         >
-          U
+          <UnderLine />
         </Btn>
         <Btn
           active={editor.isActive("strike")}
           onClick={() => editor.chain().focus().toggleStrike().run()}
         >
-          S
+          <StrikethroughIcon />
         </Btn>
         <Btn
           active={editor.isActive("code")}
           onClick={() => editor.chain().focus().toggleCode().run()}
         >
-          &lt;/&gt;
+          <CodeXml />
         </Btn>
 
         <Divider />
-
         <Btn
-          active={editor.isActive("bulletList")}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          active={editor.isActive({ textAlign: "left" })}
+          onClick={() => editor.chain().focus().setTextAlign("left").run()}
         >
-          •
-        </Btn>
-        <Btn
-          active={editor.isActive("orderedList")}
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        >
-          1.
+          <TextAlignStart />
         </Btn>
 
-        <Divider />
+        <Btn
+          active={editor.isActive({ textAlign: "center" })}
+          onClick={() => editor.chain().focus().setTextAlign("center").run()}
+        >
+          <TextAlignCenter />
+        </Btn>
+
+        <Btn
+          active={editor.isActive({ textAlign: "right" })}
+          onClick={() => editor.chain().focus().setTextAlign("right").run()}
+        >
+          <TextAlignEnd />
+        </Btn>
+
+        <Btn
+          active={editor.isActive({ textAlign: "justify" })}
+          onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+        >
+          <AlignJustify />
+        </Btn>
 
         <Btn
           active={editor.isActive("link")}
@@ -98,36 +126,55 @@ const RichTextEditor = ({ value, onChange, error }) => {
             if (url) editor.chain().focus().setLink({ href: url }).run();
           }}
         >
-          🔗
+          <LINK />
         </Btn>
 
         <Btn
-          onClick={() => {
-            const url = prompt("Image URL");
-            if (url) editor.chain().focus().setImage({ src: url }).run();
-          }}
+          active={editor.isActive("bulletList")}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
-          🖼
+          <List />
         </Btn>
 
-        <Divider />
-
-        <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()}>
-          ―
+        <Btn
+          active={editor.isActive("orderedList")}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        >
+          <ListOrdered />
         </Btn>
+
+        <Btn onClick={() => imageInputRef.current.click()}>
+          <PHOTO />
+        </Btn>
+
+        <input
+          type="file"
+          accept="image/*"
+          ref={imageInputRef}
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            const url = URL.createObjectURL(file);
+            editor.chain().focus().setImage({ src: url }).run();
+
+            e.target.value = null;
+          }}
+        />
 
         <Btn
           onClick={() =>
             editor.chain().focus().clearNodes().unsetAllMarks().run()
           }
         >
-          ✕
+          <X />
         </Btn>
       </div>
 
       {/* Editor */}
       <div
-        className={`border rounded-lg bg-base-100
+        className={`border bg-base-100 rounded-b-lg
         ${error ? "border-error" : "border-base-300"}`}
         onClick={() => editor.chain().focus().run()}
       >
