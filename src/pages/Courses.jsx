@@ -145,7 +145,10 @@ const Courses = () => {
             headers={headers}
             data={filteredCourses}
             renderRow={(course) => (
-              <tr key={course.id} className="border-b border-gray-700 ">
+              <tr
+                key={course.id}
+                className="border-b border-gray-700 hover:bg-base-300"
+              >
                 <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
                   {course.name}
                 </td>

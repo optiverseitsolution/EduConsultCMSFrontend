@@ -7,10 +7,10 @@ const universities = [
 
 const TopUniversities = () => {
   return (
-    <div className="rounded-xl border border-gray-800 bg-base-200/60">
+    <div className="rounded-xl border border-gray-700 hover:bg-base-300 ">
       <div className="p-5 sm:p-6">
         {/* Title */}
-        <h3 className="text-base font-semibold mb-4">
+        <h3 className="text-base font-semibold font-sans mb-4">
           Top Universities
         </h3>
 
