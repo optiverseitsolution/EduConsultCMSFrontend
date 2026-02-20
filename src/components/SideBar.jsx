@@ -10,48 +10,53 @@ import {
   User2,
   UserCog,
   Box,
-  Plane,  
+  Plane,
 } from "lucide-react";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const navItems = [
-    { id: "dashboard", label: "Dashboard", path: "/", icon: LayoutDashboard },
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      path: "/dashboard",
+      icon: LayoutDashboard,
+    },
     {
       id: "users-roles",
       label: "Users & Roles",
-      path: "/userrole",
+      path: "userrole",
       icon: Shield,
     },
     {
       id: "students",
       label: "Students",
-      path: "/student",
+      path: "student",
       icon: GraduationCap,
     },
-    { id: "courses", label: "Courses", path: "/courses", icon: BookOpen },
+    { id: "courses", label: "Courses", path: "courses", icon: BookOpen },
     {
       id: "universities",
       label: "Universities",
-      path: "/universities",
+      path: "universities",
       icon: Building2,
     },
     {
       id: "counselors",
       label: "Counselors",
-      path: "/counselor",
+      path: "counselor",
       icon: UserCog,
     },
     {
       id: "consultancy",
       label: "Consultancy",
-      path: "/consultancy",
+      path: "consultancy",
       icon: Briefcase,
     },
-    { id: "fees", label: "Fee Structure", path: "/fee", icon: DollarSign },
-    { id: "packages", label: "Packages", path: "/packages", icon: Box },
-    { id: "Tour", label: "Tour Services", path: "/tourservices", icon: Plane },
+    { id: "fees", label: "Fee Structure", path: "fee", icon: DollarSign },
+    { id: "packages", label: "Packages", path: "packages", icon: Box },
+    { id: "Tour", label: "Tour Services", path: "tourservices", icon: Plane },
   ];
 
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -134,7 +139,10 @@ const Sidebar = () => {
         </div>
 
         {/* User Info */}
-        <div className="flex items-center justify-center md:justify-start gap-3 p-3 border-t border-gray-700 bg-base-200/50"  onClick={() => navigate("admin-profile")}>
+        <div
+          className="flex items-center justify-center md:justify-start gap-3 p-3 border-t border-gray-700 bg-base-200/50"
+          onClick={() => navigate("admin-profile")}
+        >
           <div className="p-2 rounded-full bg-primary/10 text-primary shrink-0">
             <User2 size={18} />
           </div>
