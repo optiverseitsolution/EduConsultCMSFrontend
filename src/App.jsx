@@ -26,7 +26,7 @@ function App() {
         <Route path="fee" element={<FeeStructure />} />
         <Route path="admin-profile" element={<AdminProfile />} />
         <Route path="packages" element={<Packages />} />
-        <Route path="tourservices" element={<TourServices />} /> 
+        <Route path="tourservices" element={<TourServices />} />
       </Route>
     </Routes>
   );
