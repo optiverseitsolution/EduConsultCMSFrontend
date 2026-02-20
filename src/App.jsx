@@ -11,12 +11,20 @@ import FeeStructure from "./pages/FeeStructure.jsx";
 import AdminProfile from "./pages/AdminProfile.jsx";
 import Packages from "./pages/Packages.jsx";
 import TourServices from "./pages/TourServices.jsx";
+import Register from "./pages/Register.jsx";
+import Login from "./pages/Login.jsx";
 
 function App() {
   return (
     <Routes>
+      {/* Authentication - Index Route */}
+      <Route index element={<Register />} />
+      <Route path="/register" element={<Register />} />
+ 
+      <Route path="/login" element={<Login />} />
       {/* Layout Route */}
-      <Route path="/" element={<Dashboard />}>
+
+      <Route path="/dashboard" element={<Dashboard />}>
         <Route path="userrole" element={<UsersRoles />} />
         <Route path="student" element={<Students />} />
         <Route path="courses" element={<Courses />} />
@@ -26,7 +34,7 @@ function App() {
         <Route path="fee" element={<FeeStructure />} />
         <Route path="admin-profile" element={<AdminProfile />} />
         <Route path="packages" element={<Packages />} />
-        <Route path="tourservices" element={<TourServices />} /> 
+        <Route path="tourservices" element={<TourServices />} />
       </Route>
     </Routes>
   );
