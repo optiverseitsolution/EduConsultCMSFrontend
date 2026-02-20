@@ -1,19 +1,25 @@
 import React, { useState } from "react";
 import { Eye, GraduationCap } from "lucide-react";
+import { registerUser } from "../api/authService";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [data, setData] = useState({
-    fullname: "",
+    name: "",
     email: "",
     password: "",
-    repassword: "",
+    password_confirmation: "",
   });
 
   const [formError, setFormError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showRePassword, setShowRePassword] = useState(false);
+  const [showpassword_confirmation, setShowpassword_confirmation] =
+    useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,35 +28,62 @@ const Register = () => {
       [name]: value,
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setFormError("");
     setError("");
     setSuccess("");
 
-    if (!data.fullname || !data.email || !data.password || !data.repassword) {
+    if (
+      !data.name ||
+      !data.email ||
+      !data.password ||
+      !data.password_confirmation
+    ) {
       return setFormError("All fields are required.");
     }
 
-    if (data.password.length < 6) {
-      return setFormError("Password must be at least 6 characters.");
+    if (data.password.length <= 8) {
+      return setFormError("Password must be at least 8 characters.");
     }
 
-    if (data.password !== data.repassword) {
+    if (data.password !== data.password_confirmation) {
       return setFormError("Passwords do not match.");
     }
 
-    // If everything is valid
-    setSuccess("Registration successful!");
-    console.log("User Data:", data);
+    try {
+      setLoading(true);
 
-    setData({
-      fullname: "",
-      email: "",
-      password: "",
-      repassword: "",
-    });
+      const response = await registerUser(data);
+
+      const { token, message } = response.data;
+
+      if (!token) {
+        throw new Error("Token not received");
+      }
+
+      localStorage.setItem("token", token);
+
+      setSuccess(message || "Registration successful!");
+
+      setData({
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
+    } catch (err) {
+      setFormError(
+        err.response?.data?.message || err.message || "Something went wrong",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -95,8 +128,8 @@ const Register = () => {
               <label className="text-sm font-medium">Full Name</label>
               <input
                 type="text"
-                name="fullname"
-                value={data.fullname}
+                name="name"
+                value={data.name}
                 onChange={handleChange}
                 placeholder="Full Name"
                 className="input input-bordered rounded-lg w-full focus:outline-0 focus:border-blue-600"
@@ -143,9 +176,9 @@ const Register = () => {
 
               <div className="flex items-center w-full px-3 input input-bordered rounded-lg focus-within:border-blue-600">
                 <input
-                  type={showRePassword ? "text" : "password"}
-                  name="repassword"
-                  value={data.repassword}
+                  type={showpassword_confirmation ? "text" : "password"}
+                  name="password_confirmation"
+                  value={data.password_confirmation}
                   onChange={handleChange}
                   placeholder="Confirm Password"
                   required
@@ -155,16 +188,19 @@ const Register = () => {
                 <Eye
                   size={16}
                   className="cursor-pointer text-gray-400 hover:text-blue-600"
-                  onClick={() => setShowRePassword(!showRePassword)}
+                  onClick={() =>
+                    setShowpassword_confirmation(!showpassword_confirmation)
+                  }
                 />
               </div>
             </span>
 
             <button
               type="submit"
-              className=" w-full text-white btn btn-primary bg-blue-600 border-0 rounded-lg mt-4 hover:bg-blue-700"
+              disabled={loading}
+              className="w-full text-white btn btn-primary bg-blue-600 border-0 rounded-lg mt-4 hover:bg-blue-700"
             >
-              Register
+              {loading ? "Registering..." : "Register"}
             </button>
           </form>
         </div>
@@ -173,7 +209,10 @@ const Register = () => {
         <div className="text-center w-full mt-6 pt-6 border-t border-gray-700">
           <p className="text-sm opacity-70">
             Already have an account?{" "}
-            <a href="/login" className="text-blue-600 font-semibold hover:underline">
+            <a
+              href="/login"
+              className="text-blue-600 font-semibold hover:underline"
+            >
               Sign in
             </a>
           </p>

@@ -20,8 +20,8 @@ function App() {
       {/* Authentication - Index Route */}
       <Route index element={<Register />} />
       <Route path="/register" element={<Register />} />
- 
-      <Route path="login" element={<Login />} />
+
+      <Route path="/login" element={<Login />} />
       {/* Layout Route */}
 
       <Route path="dashboard" element={<Dashboard />}>
