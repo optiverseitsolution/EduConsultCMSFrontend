@@ -12,6 +12,7 @@ import AdminProfile from "./pages/AdminProfile.jsx";
 import Packages from "./pages/Packages.jsx";
 import TourServices from "./pages/TourServices.jsx";
 import Register from "./pages/Register.jsx";
+import Login from "./pages/Login.jsx";
 
 function App() {
   return (
@@ -19,7 +20,8 @@ function App() {
       {/* Authentication - Index Route */}
       <Route index element={<Register />} />
       <Route path="/register" element={<Register />} />
-
+ 
+      <Route path="/login" element={<Login />} />
       {/* Layout Route */}
 
       <Route path="/dashboard" element={<Dashboard />}>
