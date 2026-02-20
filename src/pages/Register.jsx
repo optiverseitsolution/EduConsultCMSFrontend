@@ -10,6 +10,7 @@ const Register = () => {
   });
 
   const [formError, setFormError] = useState("");
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
@@ -21,34 +22,35 @@ const Register = () => {
       [name]: value,
     });
   };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (data.password !== data.repassword) {
-      return setFormError("Passwords do not match");
+    setFormError("");
+    setError("");
+    setSuccess("");
+
+    if (!data.fullname || !data.email || !data.password || !data.repassword) {
+      return setFormError("All fields are required.");
     }
 
     if (data.password.length < 6) {
-      return setFormError("Password must be at least 6 characters");
+      return setFormError("Password must be at least 6 characters.");
     }
 
-    try {
-      // Example API call
-      console.log("Registering:", data);
-
-      // await axios.post("/api/register", data);
-
-      setSuccess("Registration successful!");
-      setData({
-        fullname: "",
-        email: "",
-        password: "",
-        repassword: "",
-      });
-    } catch (err) {
-      setError("Something went wrong");
+    if (data.password !== data.repassword) {
+      return setFormError("Passwords do not match.");
     }
+
+    // If everything is valid
+    setSuccess("Registration successful!");
+    console.log("User Data:", data);
+
+    setData({
+      fullname: "",
+      email: "",
+      password: "",
+      repassword: "",
+    });
   };
 
   return (
@@ -71,6 +73,23 @@ const Register = () => {
         </p>
 
         <div className="flex flex-col gap-4 w-full">
+          {formError && (
+            <div className="w-full p-2 rounded-lg bg-red-500/10 border border-red-500 text-red-500 text-sm">
+              {formError}
+            </div>
+          )}
+
+          {error && (
+            <div className="w-full p-2 rounded-lg bg-red-500/10 border border-red-500 text-red-500 text-sm">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="w-full p-2 rounded-lg bg-green-500/10 border border-green-500 text-green-500 text-sm">
+              {success}
+            </div>
+          )}
           <form onSubmit={handleSubmit}>
             <span className="flex flex-col gap-2 mt-2">
               <label className="text-sm font-medium">Full Name</label>
