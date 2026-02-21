@@ -1,6 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 import admin from "../assets/admin.jpg";
+import { getProfile, } from "../api/authService";
 
 const AdminProfile = () => {
   const [editMode, setEditMode] = useState(false);
@@ -8,12 +9,41 @@ const AdminProfile = () => {
   const [errors, setErrors] = useState({});
   const fileInputRef = useRef(null);
   const [preview, setPreview] = useState(admin);
+  
+  const [loading, setLoading] = useState(true);
 
+  // 2. We start with empty strings (or fallbacks) instead of fake data
   const [profile, setProfile] = useState({
-    fullname: "Admin User",
-    email: "admin@educonsult.com",
-    phone: "+1 234 567 890",
+    fullname: "",
+    email: "",
+    phone: "", 
   });
+
+  // =============================
+  // FETCH PROFILE FROM BACKEND
+  // =============================
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await getProfile();
+        
+        // Update the profile state with the real data from the backend!
+        setProfile((prev) => ({
+          ...prev,
+          fullname: response.data.name || "", // Matching 'name' from backend to 'fullname'
+          email: response.data.email || "",
+          // Note: If your backend doesn't send a phone number yet, it will just be blank
+          phone: response.data.phone || "", 
+        }));
+      } catch (error) {
+        console.error("Failed to load admin profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,11 +76,15 @@ const AdminProfile = () => {
 
     setErrors({});
     setEditMode(false);
+    
+    // NOTE FOR LATER: You will eventually want to add an API call here 
+    // (like updateProfile()) to send the saved changes BACK to the backend!
   };
 
   const handleClick = () => {
     fileInputRef.current.click();
   };
+  
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -84,7 +118,7 @@ const AdminProfile = () => {
             <img
               src={preview}
               alt="Admin"
-              className="md:w-28 h-28 rounded-full border-4 border-base-content/10"
+              className="md:w-28 h-28 rounded-full border-4 border-base-content/10 object-cover"
             />
             {editImg && (
               <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white font-medium cursor-pointer">
@@ -101,15 +135,28 @@ const AdminProfile = () => {
           </div>
 
           <div className="flex flex-col items-center sm:items-start">
-            <h2 className="text-2xl font-bold">{profile.fullname}</h2>
-            <p className="text-gray-400">Role: Super Admin</p>
-            <p className="text-gray-400">Email: {profile.email}</p>
+            {/* Show a loading message while waiting for the postman */}
+            {loading ? (
+              <div className="animate-pulse">
+                <div className="h-6 w-32 bg-gray-500 rounded mb-2"></div>
+                <div className="h-4 w-48 bg-gray-500 rounded"></div>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold">{profile.fullname}</h2>
+                <p className="text-gray-400">Role: Super Admin</p>
+                <p className="text-gray-400">Email: {profile.email}</p>
+                {/* Optional: Show phone number if you want */}
+                {profile.phone && <p className="text-gray-400">Phone: {profile.phone}</p>}
+              </>
+            )}
           </div>
         </div>
 
         <button
           className="btn btn-outline btn-sm gap-2"
           onClick={() => setEditMode(!editMode)}
+          disabled={loading} // Don't allow editing until data loads!
         >
           {editMode ? (
             <>
@@ -187,7 +234,7 @@ const AdminProfile = () => {
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <button
-              className="btn bg-blue-600 w-full sm:w-auto"
+              className="btn bg-blue-600 w-full sm:w-auto text-white hover:bg-blue-700"
               onClick={handleSave}
             >
               Save Changes
