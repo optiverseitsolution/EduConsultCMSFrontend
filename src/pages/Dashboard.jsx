@@ -6,7 +6,7 @@ import { Outlet, useLocation } from "react-router-dom";
 
 const Dashboard = () => {
   const location = useLocation();
-  const isDashboardHome = location.pathname === "/";
+  const isDashboardHome = location.pathname === "/dashboard";
 
   return (
     <div className="flex min-h-screen">

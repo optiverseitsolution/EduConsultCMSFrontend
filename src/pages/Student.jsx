@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
 import FormModal from "../components/modal/FormModal";
+import {
+  getStudents,
+  createStudent,
+  updateStudent,
+  deleteStudent,
+  updateStudentStatus,
+} from "../api/authService";
 
 const headers = [
   "S.N.",
@@ -18,75 +25,176 @@ const headers = [
 ];
 
 const Students = () => {
-  const [students, setStudents] = useState([
-    {
-      id: 1,
-      name: "Alice Johnson",
-      email: "alice@example.com",
-      course: "BSc IT",
-      university: "Oxford University",
-      status: "Active",
-      application: "Approved",
-      counselor: "John Doe",
-    },
-    {
-      id: 2,
-      name: "Bob Smith",
-      email: "bob@example.com",
-      course: "MSc CS",
-      university: "MIT",
-      status: "Active",
-      application: "Pending",
-      counselor: "Jane Smith",
-    },
-    {
-      id: 3,
-      name: "Carol White",
-      email: "carol@example.com",
-      course: "MBA",
-      university: "Stanford",
-      status: "Active",
-      application: "Under Review",
-      counselor: "Mike Johnson",
-    },
-  ]);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingStudent, setEditingStudent] = useState(null);
 
   /** 🔹 Modal Fields */
   const studentFields = [
-    { name: "name", label: "Student Name", placeholder: "Alice Johnson" },
+    { 
+      name: "student", 
+      label: "Student Name", 
+      placeholder: "Enter student name",
+      required: true 
+    },
     {
       name: "email",
       label: "Email",
       type: "email",
-      placeholder: "alice@example.com",
+      placeholder: "student@example.com",
+      required: true
     },
-    { name: "course", label: "Course", placeholder: "BSc IT" },
-    { name: "university", label: "Applied University" },
+    {
+      name: "profile_image",
+      label: "Profile Image",
+      type: "file",
+      accept: "image/*",
+    },
+    { 
+      name: "course", 
+      label: "Course", 
+      placeholder: "e.g., BSc IT, MSc CS",
+      required: true 
+    },
+    { 
+      name: "applied_university", 
+      label: "Applied University",
+      placeholder: "Enter university name",
+      required: true
+    },
     {
       name: "status",
       label: "Status",
       type: "select",
       options: ["Active", "Inactive"],
+      required: true
     },
     {
       name: "application",
       label: "Application Status",
       type: "select",
       options: ["Approved", "Pending", "Under Review"],
+      required: true
     },
-    { name: "counselor", label: "Counselor Name" },
+    { 
+      name: "counselor", 
+      label: "Counselor Name",
+      placeholder: "Enter counselor name",
+      required: true
+    },
   ];
 
-  /** 🔹 Add Student */
-  const handleAddStudent = (newStudent) => {
-    setStudents((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        ...newStudent,
-      },
-    ]);
+  // =============================
+  // FETCH STUDENTS FROM BACKEND
+  // =============================
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      setLoading(true);
+      const response = await getStudents();
+      setStudents(response.data.data || []);
+    } catch (error) {
+      console.error("Failed to load students:", error);
+      alert("Failed to load students. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // =============================
+  // ADD STUDENT
+  // =============================
+  const handleAddStudent = async (newStudent) => {
+    try {
+      // Convert "Active"/"Inactive" to "1"/"0"
+      const studentData = {
+        ...newStudent,
+        status: newStudent.status === "Active" ? "1" : "0",
+      };
+
+      await createStudent(studentData);
+      await fetchStudents(); // Refresh the list
+      document.getElementById("add_student_modal").close();
+    } catch (error) {
+      console.error("Error adding student:", error);
+      alert("Failed to add student. Please try again.");
+    }
+  };
+
+  // =============================
+  // EDIT STUDENT
+  // =============================
+  const handleEditClick = (student) => {
+    setEditingStudent(student);
+    document.getElementById("edit_student_modal").showModal();
+  };
+
+  const handleUpdateStudent = async (updatedData) => {
+    try {
+      // Convert "Active"/"Inactive" to "1"/"0"
+      const studentData = {
+        ...updatedData,
+        status: updatedData.status === "Active" ? "1" : "0",
+      };
+
+      await updateStudent(editingStudent.id, studentData);
+      await fetchStudents(); // Refresh the list
+      document.getElementById("edit_student_modal").close();
+      setEditingStudent(null);
+    } catch (error) {
+      console.error("Error updating student:", error);
+      alert("Failed to update student. Please try again.");
+    }
+  };
+
+  // =============================
+  // DELETE STUDENT
+  // =============================
+  const handleDeleteStudent = async (studentId) => {
+    if (!window.confirm("Are you sure you want to delete this student?")) {
+      return;
+    }
+
+    try {
+      await deleteStudent(studentId);
+      await fetchStudents(); // Refresh the list
+    } catch (error) {
+      console.error("Error deleting student:", error);
+      alert("Failed to delete student. Please try again.");
+    }
+  };
+
+  // =============================
+  // TOGGLE STATUS
+  // =============================
+  const handleToggleStatus = async (studentId, currentStatus) => {
+    try {
+      const newStatus = currentStatus ? "0" : "1";
+      await updateStudentStatus(studentId, newStatus);
+      await fetchStudents(); // Refresh the list
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status. Please try again.");
+    }
+  };
+
+  // =============================
+  // FILTER STUDENTS (SEARCH)
+  // =============================
+  const filteredStudents = students.filter((student) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      student.student?.toLowerCase().includes(searchLower) ||
+      student.email?.toLowerCase().includes(searchLower) ||
+      student.course?.toLowerCase().includes(searchLower) ||
+      student.applied_university?.toLowerCase().includes(searchLower) ||
+      student.counselor?.toLowerCase().includes(searchLower)
+    );
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -124,95 +232,145 @@ const Students = () => {
             <input
               type="text"
               placeholder="Search students..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-2 py-2 rounded-lg border border-gray-700 focus:outline-none focus:border-blue-500"
             />
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <Table
-            headers={headers}
-            data={students}
-            renderRow={(s, index) => (
-              <tr key={s.id} className="border-b border-gray-700 hover:bg-base-300">
-                <td className="px-2 sm:px-4 py-4">{index + 1}</td>
-
-                <td className="px-2 sm:px-4 py-4">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={`https://ui-avatars.com/api/?name=${s.name}`}
-                      alt={s.name}
-                      className="w-8 h-8 rounded-full"
-                    />
-                    <span>{s.name}</span>
-                  </div>
-                </td>
-
-                <td className="px-2 sm:px-4 py-4">{s.email}</td>
-                <td className="px-2 sm:px-4 py-4">{s.course}</td>
-                <td className="px-2 sm:px-4 py-4">{s.university}</td>
-
-                <td className="px-2 sm:px-4 py-4">
-                  <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs">
-                    {s.status}
-                  </span>
-                </td>
-
-                <td className="px-2 sm:px-4 py-4">
-                  <span className="bg-gray-600 text-white px-3 py-1 rounded-lg text-xs">
-                    {s.application}
-                  </span>
-                </td>
-
-                <td className="px-2 sm:px-4 py-4">{s.counselor}</td>
-
-                <td className="px-2 sm:px-4 py-4">
-                  <div className="flex gap-3 text-sm">
-                    <button className="hover:text-blue-300">View</button>
-                    <button className="hover:text-blue-300">Edit</button>
-                    <button className="hover:text-red-300">Delete</button>
-                  </div>
-                </td>
-              </tr>
-            )}
-          />
-
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-4">
-            {students.map((s) => (
-              <MobileCard
-                key={s.id}
-                title={s.name}
-                fields={[
-                  { label: "Email", value: s.email },
-                  { label: "Course", value: s.course },
-                  { label: "University", value: s.university },
-                  { label: "Status", value: s.status },
-                  { label: "Application", value: s.application },
-                  { label: "Counselor", value: s.counselor },
-                ]}
-                actions={[
-                  {
-                    label: "View",
-                    className: "text-blue-400 text-sm",
-                    onClick: () => console.log("View", s),
-                  },
-                  {
-                    label: "Edit",
-                    className: "text-blue-400 text-sm",
-                    onClick: () => console.log("Edit", s),
-                  },
-                  {
-                    label: "Delete",
-                    className: "text-red-400 text-sm",
-                    onClick: () => console.log("Delete", s),
-                  },
-                ]}
-              />
-            ))}
+        {/* Loading State */}
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-700 rounded w-full mb-4"></div>
+              <div className="h-8 bg-gray-700 rounded w-full mb-4"></div>
+              <div className="h-8 bg-gray-700 rounded w-full mb-4"></div>
+            </div>
+            <p className="text-gray-400 mt-4">Loading students...</p>
           </div>
-        </div>
+        ) : filteredStudents.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-400">
+              {searchTerm ? "No students found matching your search" : "No students found"}
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Desktop Table */}
+            <div className="overflow-x-auto hidden md:block">
+              <Table
+                headers={headers}
+                data={filteredStudents}
+                renderRow={(s, index) => (
+                  <tr
+                    key={s.id}
+                    className="border-b border-gray-700 hover:bg-base-300"
+                  >
+                    <td className="px-2 sm:px-4 py-4">{index + 1}</td>
+
+                    <td className="px-2 sm:px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={
+                            s.profile_image ||
+                            `https://ui-avatars.com/api/?name=${s.student}&background=random`
+                          }
+                          alt={s.student}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                        <span>{s.student}</span>
+                      </div>
+                    </td>
+
+                    <td className="px-2 sm:px-4 py-4">{s.email}</td>
+                    <td className="px-2 sm:px-4 py-4">{s.course}</td>
+                    <td className="px-2 sm:px-4 py-4">{s.applied_university}</td>
+
+                    <td className="px-2 sm:px-4 py-4">
+                      <button
+                        onClick={() => handleToggleStatus(s.id, s.status)}
+                        className={`${
+                          s.status
+                            ? "bg-blue-600 hover:bg-blue-700"
+                            : "bg-gray-600 hover:bg-gray-700"
+                        } text-white px-3 py-1 rounded-lg text-xs transition-colors`}
+                      >
+                        {s.status ? "Active" : "Inactive"}
+                      </button>
+                    </td>
+
+                    <td className="px-2 sm:px-4 py-4">
+                      <span
+                        className={`px-3 py-1 rounded-lg text-xs ${
+                          s.application === "Approved"
+                            ? "bg-blue-600 text-white"
+                            : s.application === "Pending"
+                            ? "bg-gray-600 text-white"
+                            : "bg-blue-600 text-white"
+                        }`}
+                      >
+                        {s.application}
+                      </span>
+                    </td>
+
+                    <td className="px-2 sm:px-4 py-4">{s.counselor}</td>
+
+                    <td className="px-2 sm:px-4 py-4">
+                      <div className="flex gap-3 text-sm">
+                        <button
+                          onClick={() => handleEditClick(s)}
+                          className="hover:text-blue-300 transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteStudent(s.id)}
+                          className="hover:text-red-300 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              />
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-4">
+              {filteredStudents.map((s) => (
+                <MobileCard
+                  key={s.id}
+                  title={s.student}
+                  fields={[
+                    { label: "Email", value: s.email },
+                    { label: "Course", value: s.course },
+                    { label: "University", value: s.applied_university },
+                    {
+                      label: "Status",
+                      value: s.status ? "Active" : "Inactive",
+                    },
+                    { label: "Application", value: s.application },
+                    { label: "Counselor", value: s.counselor },
+                  ]}
+                  actions={[
+                    {
+                      label: "Edit",
+                      className: "text-blue-400 text-sm",
+                      onClick: () => handleEditClick(s),
+                    },
+                    {
+                      label: "Delete",
+                      className: "text-red-400 text-sm",
+                      onClick: () => handleDeleteStudent(s.id),
+                    },
+                  ]}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* 🔹 Add Student Modal */}
@@ -222,6 +380,25 @@ const Students = () => {
         fields={studentFields}
         onSave={handleAddStudent}
       />
+
+      {/* 🔹 Edit Student Modal */}
+      {editingStudent && (
+        <FormModal
+          id="edit_student_modal"
+          title="Edit Student"
+          fields={studentFields}
+          onSave={handleUpdateStudent}
+          initialData={{
+            student: editingStudent.student,
+            email: editingStudent.email,
+            course: editingStudent.course,
+            applied_university: editingStudent.applied_university,
+            status: editingStudent.status ? "Active" : "Inactive",
+            application: editingStudent.application,
+            counselor: editingStudent.counselor,
+          }}
+        />
+      )}
     </div>
   );
 };
