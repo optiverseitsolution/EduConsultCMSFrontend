@@ -1,14 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const FormModal = ({ id, title, fields, onSave }) => {
+const UpdateModal = ({ id, title, fields, data, onSave }) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (data) {
+      setFormData(data);
+    }
+  }, [data]);
+
   const handleChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -17,12 +27,19 @@ const FormModal = ({ id, title, fields, onSave }) => {
     fields.forEach((field) => {
       const value = formData[field.name];
 
-      if (!value) {
-        newErrors[field.name] = `${field.label} is required`;
+      if (field.type === "file") {
+        return;
       }
 
-      if (field.type === "number" && value < 0) {
-        newErrors[field.name] = `${field.label} cannot be negative`;
+      if (field.type === "number") {
+        if (value === "" || value === null || value === undefined) {
+          newErrors[field.name] = `${field.label} is required`;
+        }
+        if (value < 0) {
+          newErrors[field.name] = `${field.label} cannot be negative`;
+        }
+      } else if (!value) {
+        newErrors[field.name] = `${field.label} is required`;
       }
     });
 
@@ -38,7 +55,6 @@ const FormModal = ({ id, title, fields, onSave }) => {
       document.getElementById(id).close();
       setFormData({});
       setErrors({});
-      // console.log(formData);
     } catch (err) {
       if (err.response?.data?.errors) {
         setErrors(err.response.data.errors);
@@ -49,6 +65,7 @@ const FormModal = ({ id, title, fields, onSave }) => {
       setLoading(false);
     }
   };
+
   return (
     <dialog id={id} className="modal">
       <div className="modal-box w-11/12 max-w-4xl">
@@ -68,7 +85,16 @@ const FormModal = ({ id, title, fields, onSave }) => {
               <label className="label font-medium">{field.label}</label>
 
               {field.type === "file" ? (
-                <>
+                <div className="flex items-center gap-2">
+                  {" "}
+                  {formData[field.name] &&
+                    typeof formData[field.name] === "string" && (
+                      <img
+                        src={formData[field.name]}
+                        alt="Logo preview"
+                        className="mt-2 w-20 h-20 object-cover rounded"
+                      />
+                    )}
                   <label
                     className={`flex items-center justify-between gap-4 input input-bordered w-full px-4 py-3 cursor-pointer
                       ${errors[field.name] ? "border-red-500" : ""}`}
@@ -87,13 +113,12 @@ const FormModal = ({ id, title, fields, onSave }) => {
                       }
                     />
                   </label>
-
                   {errors[field.name] && (
                     <p className="text-red-500 text-xs mt-1">
                       {errors[field.name]}
                     </p>
                   )}
-                </>
+                </div>
               ) : field.type === "textarea" ? (
                 <>
                   <textarea
@@ -179,4 +204,4 @@ const FormModal = ({ id, title, fields, onSave }) => {
   );
 };
 
-export default FormModal;
+export default UpdateModal;
