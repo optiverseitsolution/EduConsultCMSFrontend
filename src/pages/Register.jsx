@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Eye, GraduationCap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { registerUser } from "../api/authService";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [data, setData] = useState({
     fullname: "",
     email: "",
@@ -11,19 +15,21 @@ const Register = () => {
 
   const [formError, setFormError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setData({
-      ...data,
-      [name]: value,
-    });
+    setData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormError("");
+    setSuccess("");
 
     if (data.password !== data.repassword) {
       return setFormError("Passwords do not match");
@@ -34,131 +40,140 @@ const Register = () => {
     }
 
     try {
-      // Example API call
-      console.log("Registering:", data);
+      setLoading(true);
 
-      // await axios.post("/api/register", data);
+      const response = await registerUser({
+        name: data.fullname,
+        email: data.email,
+        password: data.password,
+        password_confirmation: data.repassword,
+      });
 
       setSuccess("Registration successful!");
+
       setData({
         fullname: "",
         email: "",
         password: "",
         repassword: "",
       });
-    } catch (err) {
-      setError("Something went wrong");
+
+      // Redirect to login after 1.5s
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
+    } catch (error) {
+      setFormError(
+        error.response?.data?.message ||
+        "Registration failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-base-100">
-      <div className="w-full max-w-sm gap-2 flex flex-col items-start p-8 rounded-2xl bg-base-200/50 border border-gray-700">
+      <div className="w-full max-w-sm p-8 rounded-2xl bg-base-200/50 border border-gray-700">
+
+        {/* Logo */}
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-600 rounded-lg text-white">
             <GraduationCap size={32} />
           </div>
-          <div>
-            <h1 className="text-2xl font-black">EduConsult</h1>
-          </div>
+          <h1 className="text-2xl font-black">EduConsult</h1>
         </div>
 
-        <header className="text-2xl font-black ">
-          <h1>Register.</h1>
-        </header>
+        <h1 className="text-2xl font-black mb-2">Register</h1>
         <p className="text-sm opacity-70 mb-6">
           Create your account to get started
         </p>
 
-        <div className="flex flex-col gap-4 w-full">
-          <form onSubmit={handleSubmit}>
-            <span className="flex flex-col gap-2 mt-2">
-              <label className="text-sm font-medium">Full Name</label>
-              <input
-                type="text"
-                name="fullname"
-                value={data.fullname}
-                onChange={handleChange}
-                placeholder="Full Name"
-                className="input input-bordered rounded-lg w-full focus:outline-0 focus:border-blue-600"
-                required
-              />
-            </span>
-            <span className="flex flex-col gap-2 mt-2">
-              <label className="text-sm font-medium">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={data.email}
-                onChange={handleChange}
-                placeholder="your@email.com"
-                className="input input-bordered rounded-lg w-full focus:outline-0 focus:border-blue-600"
-                required
-              />
-            </span>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-            <span className="flex flex-col gap-2 mt-2">
-              <label className="text-sm font-medium">Password</label>
+          <input
+            type="text"
+            name="fullname"
+            value={data.fullname}
+            onChange={handleChange}
+            placeholder="Full Name"
+            className="input input-bordered rounded-lg w-full"
+            required
+          />
 
-              <div className="flex items-center w-full px-3 input input-bordered rounded-lg focus-within:border-blue-600 focus:outline-0">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={data.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                  required
-                  className="w-full bg-transparent focus:outline-none"
-                />
+          <input
+            type="email"
+            name="email"
+            value={data.email}
+            onChange={handleChange}
+            placeholder="Email"
+            className="input input-bordered rounded-lg w-full"
+            required
+          />
 
-                <Eye
-                  size={16}
-                  className="cursor-pointer text-gray-400 hover:text-blue-600"
-                  onClick={() => setShowPassword(!showPassword)}
-                />
-              </div>
-            </span>
+          {/* Password */}
+          <div className="flex items-center w-full px-3 input input-bordered rounded-lg">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={data.password}
+              onChange={handleChange}
+              placeholder="Password"
+              className="w-full bg-transparent focus:outline-none"
+              required
+            />
+            <Eye
+              size={16}
+              className="cursor-pointer text-gray-400"
+              onClick={() => setShowPassword(!showPassword)}
+            />
+          </div>
 
-            <span className="flex flex-col gap-2 mt-2">
-              <label className="text-sm font-medium">Confirm Password</label>
+          {/* Confirm Password */}
+          <div className="flex items-center w-full px-3 input input-bordered rounded-lg">
+            <input
+              type={showRePassword ? "text" : "password"}
+              name="repassword"
+              value={data.repassword}
+              onChange={handleChange}
+              placeholder="Confirm Password"
+              className="w-full bg-transparent focus:outline-none"
+              required
+            />
+            <Eye
+              size={16}
+              className="cursor-pointer text-gray-400"
+              onClick={() => setShowRePassword(!showRePassword)}
+            />
+          </div>
 
-              <div className="flex items-center w-full px-3 input input-bordered rounded-lg focus-within:border-blue-600">
-                <input
-                  type={showRePassword ? "text" : "password"}
-                  name="repassword"
-                  value={data.repassword}
-                  onChange={handleChange}
-                  placeholder="Confirm Password"
-                  required
-                  className="w-full bg-transparent focus:outline-none"
-                />
+          {formError && (
+            <p className="text-red-500 text-sm">{formError}</p>
+          )}
 
-                <Eye
-                  size={16}
-                  className="cursor-pointer text-gray-400 hover:text-blue-600"
-                  onClick={() => setShowRePassword(!showRePassword)}
-                />
-              </div>
-            </span>
+          {success && (
+            <p className="text-green-500 text-sm">{success}</p>
+          )}
 
-            <button
-              type="submit"
-              className=" w-full text-white btn btn-primary bg-blue-600 border-0 rounded-lg mt-4 hover:bg-blue-700"
-            >
-              Register
-            </button>
-          </form>
-        </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn bg-blue-600 text-white rounded-lg"
+          >
+            {loading ? "Registering..." : "Register"}
+          </button>
+        </form>
 
-        {/* Footer */}
-        <div className="text-center w-full mt-6 pt-6 border-t border-gray-700">
+        <div className="text-center mt-6 pt-6 border-t border-gray-700">
           <p className="text-sm opacity-70">
             Already have an account?{" "}
-            <a href="#" className="text-blue-600 font-semibold hover:underline">
+            <a href="/login" className="text-blue-600 font-semibold">
               Sign in
             </a>
           </p>
         </div>
+
       </div>
     </div>
   );

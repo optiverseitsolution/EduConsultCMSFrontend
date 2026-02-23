@@ -1,7 +1,7 @@
 // import { useState } from 'react'
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard.jsx";
-import Counselors from "./pages/Counsul.jsx";
+import Counselors from "./pages/Counsulers.jsx";
 import Courses from "./pages/Courses.jsx";
 import Universities from "./pages/Universities.jsx";
 import UsersRoles from "./pages/UsersRoles.jsx";
@@ -21,7 +21,7 @@ function App() {
       <Route index element={<Register />} />
       <Route path="/register" element={<Register />} />
  
-      <Route path="/login" element={<Login />} />
+      <Route path="login" element={<Login />} />
       {/* Layout Route */}
 
       <Route path="/dashboard" element={<Dashboard />}>
