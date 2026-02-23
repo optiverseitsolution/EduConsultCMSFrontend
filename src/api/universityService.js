@@ -42,7 +42,9 @@ export const updateUniversity = async (data) => {
   formData.append("application_fee", `$${data.applicationFee}`);
   formData.append("status", data.status === "Active" ? "1" : "0");
 
-  const response = await api.put(`/universities/${data.id}`, formData, {
+  formData.append("_method", "PUT");
+
+  const response = await api.post(`/universities/${data.id}`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

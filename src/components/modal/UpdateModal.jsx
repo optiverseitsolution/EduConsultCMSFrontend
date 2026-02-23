@@ -17,6 +17,7 @@ const UpdateModal = ({ id, title, fields, data, onSave }) => {
       [name]: value,
     }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
+    console.log(formData);
   };
 
   const handleSubmit = async (e) => {

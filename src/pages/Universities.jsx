@@ -130,8 +130,15 @@ const Universities = () => {
   }, []);
 
   const handleEditUni = async (updateUni) => {
+    if (!selectedUni?.id) {
+      console.error("Cannot update university: ID is missing");
+      return;
+    }
+
     try {
-      const updated = await updateUniversity(updateUni);
+      const uniToUpdate = { ...updateUni, id: selectedUni.id };
+
+      const updated = await updateUniversity(uniToUpdate);
 
       const formattedUniversity = {
         id: updated.id,
@@ -151,7 +158,7 @@ const Universities = () => {
         ),
       );
     } catch (err) {
-      console.error("Update failed", err);
+      setError(err.response?.data?.message || "Something went wrong");
     }
   };
 
