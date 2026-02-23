@@ -3,20 +3,21 @@ import React, { useState } from "react";
 const FormModal = ({ id, title, fields, onSave }) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     let newErrors = {};
+
     fields.forEach((field) => {
       const value = formData[field.name];
 
-      if (!formData[field.name]) {
+      if (!value) {
         newErrors[field.name] = `${field.label} is required`;
       }
 
@@ -30,12 +31,24 @@ const FormModal = ({ id, title, fields, onSave }) => {
       return;
     }
 
-    onSave(formData);
-    document.getElementById(id).close();
-    setFormData({});
-    setErrors({});
-  };
+    try {
+      setLoading(true);
+      await onSave(formData);
 
+      document.getElementById(id).close();
+      setFormData({});
+      setErrors({});
+      console.log(formData);
+    } catch (err) {
+      if (err.response?.data?.errors) {
+        setErrors(err.response.data.errors);
+      } else {
+        setErrors({ general: "Something went wrong" });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <dialog id={id} className="modal">
       <div className="modal-box w-11/12 max-w-4xl">
@@ -152,8 +165,12 @@ const FormModal = ({ id, title, fields, onSave }) => {
             >
               Cancel
             </button>
-            <button type="submit" className="btn bg-blue-600 text-white">
-              Save
+            <button
+              type="submit"
+              className="btn bg-blue-600 text-white"
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save"}
             </button>
           </div>
         </form>

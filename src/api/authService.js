@@ -11,3 +11,4 @@ export const getProfile = () =>
 
 export const updateProfile = (data) =>
   api.put("/profile", data);
+

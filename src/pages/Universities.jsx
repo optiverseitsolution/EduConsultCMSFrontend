@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import oxford from "../assets/logos/oxford.png";
@@ -7,43 +7,10 @@ import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
 import ViewModal from "../components/modal/ViewModal";
 import SeacrhModal from "../components/modal/SeacrhModal";
+import { getAllUniversity, registerUniversity } from "../api/universityService";
 
 const Universities = () => {
-  const [universities, setUniversities] = useState([
-    {
-      id: 1,
-      logo: oxford,
-      name: "Oxford University",
-      country: "UK",
-      city: "Oxford",
-      partnerType: "Partner",
-      programs: 45,
-      applicationFee: 50,
-      status: "Active",
-    },
-    {
-      id: 2,
-      logo: oxford,
-      name: "Sydney University",
-      country: "Australia",
-      city: "Sydney",
-      partnerType: "Partner",
-      programs: 38,
-      applicationFee: 0,
-      status: "Active",
-    },
-    {
-      id: 3,
-      logo: oxford,
-      name: "Stanford University",
-      country: "USA",
-      city: "Stanford",
-      partnerType: "Non-Partner",
-      programs: 52,
-      applicationFee: 75,
-      status: "Active",
-    },
-  ]);
+  const [universities, setUniversities] = useState([]);
 
   const headers = [
     "Logo",
@@ -103,23 +70,59 @@ const Universities = () => {
     },
   ];
 
-  const handleAddUni = (newUni) => {
-    setUniversities((prev) => [
-      ...prev,
-      {
-        id: prev.lenghth + 1,
-        status: "Active",
-        ...newUni,
-      },
-    ]);
+  const handleAddUni = async (newUni) => {
+    try {
+      const created = await registerUniversity(newUni);
+
+      const formattedUniversity = {
+        id: created.id,
+        logo: created.logo,
+        name: created.university_name,
+        country: created.country,
+        city: created.city,
+        partnerType: created.partner_type,
+        programs: created.programs,
+        applicationFee: created.application_fee.replace("$", ""),
+        status: created.status === "1" ? "Active" : "Inactive",
+      };
+
+      setUniversities((prev) => [...prev, formattedUniversity]);
+    } catch (err) {
+      throw err;
+    }
   };
 
   const [selectedUni, setSelectedUni] = useState(null);
   const [search, setSearch] = useState("");
 
   const filteredUni = universities.filter((uni) =>
-    Object.values(uni).join(" ").toLowerCase().includes(search.toLowerCase())
+    Object.values(uni).join(" ").toLowerCase().includes(search.toLowerCase()),
   );
+
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        const uni = await getAllUniversity();
+        const formattedUniversities = uni.map((item) => ({
+          id: item.id,
+          logo: item.logo,
+          name: item.university_name,
+          country: item.country,
+          city: item.city,
+          partnerType: item.partner_type,
+          programs: item.programs,
+          applicationFee: item.application_fee.replace("$", ""),
+          status: item.status === "1" ? "Active" : "Inactive",
+        }));
+        setUniversities(formattedUniversities);
+      } catch (err) {
+        console.error("Error fetching universities:", err);
+      }
+    };
+
+    fetchUniversities();
+  }, []);
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -194,7 +197,13 @@ const Universities = () => {
                 </td>
 
                 <td className="px-2 sm:px-4 py-4">
-                  <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs">
+                  <span
+                    className={`px-3 py-1 rounded-lg text-xs text-white ${
+                      university.status === "Active"
+                        ? "bg-blue-600"
+                        : "bg-gray-600"
+                    }`}
+                  >
                     {university.status}
                   </span>
                 </td>
