@@ -4,8 +4,6 @@ import { registerUser } from "../api/authService";
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
-  const navigate = useNavigate();
-
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -16,7 +14,6 @@ const Register = () => {
   const [formError, setFormError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showpassword_confirmation, setShowpassword_confirmation] =
     useState(false);
@@ -25,15 +22,14 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setData({
+      ...data,
+      [name]: value,
+    });
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormError("");
-    setSuccess("");
 
     setFormError("");
     setError("");
@@ -92,17 +88,19 @@ const Register = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-base-100">
-      <div className="w-full max-w-sm p-8 rounded-2xl bg-base-200/50 border border-gray-700">
-
-        {/* Logo */}
+      <div className="w-full max-w-sm gap-2 flex flex-col items-start p-8 rounded-2xl bg-base-200/50 border border-gray-700">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-600 rounded-lg text-white">
             <GraduationCap size={32} />
           </div>
-          <h1 className="text-2xl font-black">EduConsult</h1>
+          <div>
+            <h1 className="text-2xl font-black">EduConsult</h1>
+          </div>
         </div>
 
-        <h1 className="text-2xl font-black mb-2">Register</h1>
+        <header className="text-2xl font-black ">
+          <h1>Register.</h1>
+        </header>
         <p className="text-sm opacity-70 mb-6">
           Create your account to get started
         </p>
@@ -197,16 +195,18 @@ const Register = () => {
               </div>
             </span>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn bg-blue-600 text-white rounded-lg"
-          >
-            {loading ? "Registering..." : "Register"}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full text-white btn btn-primary bg-blue-600 border-0 rounded-lg mt-4 hover:bg-blue-700"
+            >
+              {loading ? "Registering..." : "Register"}
+            </button>
+          </form>
+        </div>
 
-        <div className="text-center mt-6 pt-6 border-t border-gray-700">
+        {/* Footer */}
+        <div className="text-center w-full mt-6 pt-6 border-t border-gray-700">
           <p className="text-sm opacity-70">
             Already have an account?{" "}
             <a
@@ -217,7 +217,6 @@ const Register = () => {
             </a>
           </p>
         </div>
-
       </div>
     </div>
   );
