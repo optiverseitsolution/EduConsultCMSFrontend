@@ -4,6 +4,7 @@ import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
 import FormModal from "../components/modal/FormModal";
+import UpdateModal from "../components/modal/UpdateModal";
 import {
   getStudents,
   createStudent,
@@ -30,64 +31,17 @@ const Students = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingStudent, setEditingStudent] = useState(null);
 
-  /** 🔹 Modal Fields */
   const studentFields = [
-    { 
-      name: "student", 
-      label: "Student Name", 
-      placeholder: "Enter student name",
-      required: true 
-    },
-    {
-      name: "email",
-      label: "Email",
-      type: "email",
-      placeholder: "student@example.com",
-      required: true
-    },
-    {
-      name: "profile_image",
-      label: "Profile Image",
-      type: "file",
-      accept: "image/*",
-    },
-    { 
-      name: "course", 
-      label: "Course", 
-      placeholder: "e.g., BSc IT, MSc CS",
-      required: true 
-    },
-    { 
-      name: "applied_university", 
-      label: "Applied University",
-      placeholder: "Enter university name",
-      required: true
-    },
-    {
-      name: "status",
-      label: "Status",
-      type: "select",
-      options: ["Active", "Inactive"],
-      required: true
-    },
-    {
-      name: "application",
-      label: "Application Status",
-      type: "select",
-      options: ["Approved", "Pending", "Under Review"],
-      required: true
-    },
-    { 
-      name: "counselor", 
-      label: "Counselor Name",
-      placeholder: "Enter counselor name",
-      required: true
-    },
+    { name: "student", label: "Student Name", placeholder: "Enter student name", required: true },
+    { name: "email", label: "Email", type: "email", placeholder: "student@example.com", required: true },
+    { name: "profile_image", label: "Profile Image", type: "file", accept: "image/*" },
+    { name: "course", label: "Course", placeholder: "e.g., BSc IT, MSc CS", required: true },
+    { name: "applied_university", label: "Applied University", placeholder: "Enter university name", required: true },
+    { name: "status", label: "Status", type: "select", options: ["Active", "Inactive"], required: true },
+    { name: "application", label: "Application Status", type: "select", options: ["Approved", "Pending", "Under Review"], required: true },
+    { name: "counselor", label: "Counselor Name", placeholder: "Enter counselor name", required: true },
   ];
 
-  // =============================
-  // FETCH STUDENTS FROM BACKEND
-  // =============================
   useEffect(() => {
     fetchStudents();
   }, []);
@@ -105,19 +59,14 @@ const Students = () => {
     }
   };
 
-  // =============================
-  // ADD STUDENT
-  // =============================
   const handleAddStudent = async (newStudent) => {
     try {
-      // Convert "Active"/"Inactive" to "1"/"0"
       const studentData = {
         ...newStudent,
         status: newStudent.status === "Active" ? "1" : "0",
       };
-
       await createStudent(studentData);
-      await fetchStudents(); // Refresh the list
+      await fetchStudents();
       document.getElementById("add_student_modal").close();
     } catch (error) {
       console.error("Error adding student:", error);
@@ -125,24 +74,25 @@ const Students = () => {
     }
   };
 
-  // =============================
-  // EDIT STUDENT
-  // =============================
   const handleEditClick = (student) => {
-    setEditingStudent(student);
+    // ✅ Map the student data to match field names, including status boolean -> string
+    setEditingStudent({
+      ...student,
+      status: student.status === true || student.status === 1 || student.status === "1"
+        ? "Active"
+        : "Inactive",
+    });
     document.getElementById("edit_student_modal").showModal();
   };
 
   const handleUpdateStudent = async (updatedData) => {
     try {
-      // Convert "Active"/"Inactive" to "1"/"0"
       const studentData = {
         ...updatedData,
         status: updatedData.status === "Active" ? "1" : "0",
       };
-
       await updateStudent(editingStudent.id, studentData);
-      await fetchStudents(); // Refresh the list
+      await fetchStudents();
       document.getElementById("edit_student_modal").close();
       setEditingStudent(null);
     } catch (error) {
@@ -151,40 +101,28 @@ const Students = () => {
     }
   };
 
-  // =============================
-  // DELETE STUDENT
-  // =============================
   const handleDeleteStudent = async (studentId) => {
-    if (!window.confirm("Are you sure you want to delete this student?")) {
-      return;
-    }
-
+    if (!window.confirm("Are you sure you want to delete this student?")) return;
     try {
       await deleteStudent(studentId);
-      await fetchStudents(); // Refresh the list
+      await fetchStudents();
     } catch (error) {
       console.error("Error deleting student:", error);
       alert("Failed to delete student. Please try again.");
     }
   };
 
-  // =============================
-  // TOGGLE STATUS
-  // =============================
   const handleToggleStatus = async (studentId, currentStatus) => {
     try {
       const newStatus = currentStatus ? "0" : "1";
       await updateStudentStatus(studentId, newStatus);
-      await fetchStudents(); // Refresh the list
+      await fetchStudents();
     } catch (error) {
       console.error("Error updating status:", error);
       alert("Failed to update status. Please try again.");
     }
   };
 
-  // =============================
-  // FILTER STUDENTS (SEARCH)
-  // =============================
   const filteredStudents = students.filter((student) => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -198,19 +136,13 @@ const Students = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold">Students Management</h1>
-          <p className="text-gray-400">
-            Track and manage student applications
-          </p>
+          <p className="text-gray-400">Track and manage student applications</p>
         </div>
-
         <button
-          onClick={() =>
-            document.getElementById("add_student_modal").showModal()
-          }
+          onClick={() => document.getElementById("add_student_modal").showModal()}
           className="flex gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto"
         >
           <Plus size={18} />
@@ -218,14 +150,10 @@ const Students = () => {
         </button>
       </div>
 
-      {/* Card */}
       <div className="rounded-lg p-4 sm:p-6 border border-gray-400">
         <h2 className="text-lg font-semibold mb-2">All Students</h2>
-        <p className="text-gray-400 text-sm mb-4">
-          View and manage all registered students
-        </p>
+        <p className="text-gray-400 text-sm mb-4">View and manage all registered students</p>
 
-        {/* Search */}
         <div className="mb-6">
           <div className="relative">
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -239,7 +167,6 @@ const Students = () => {
           </div>
         </div>
 
-        {/* Loading State */}
         {loading ? (
           <div className="text-center py-8">
             <div className="animate-pulse">
@@ -257,87 +184,58 @@ const Students = () => {
           </div>
         ) : (
           <>
-            {/* Desktop Table */}
             <div className="overflow-x-auto hidden md:block">
-              <Table
-                headers={headers}
-                data={filteredStudents}
-                renderRow={(s, index) => (
-                  <tr
-                    key={s.id}
-                    className="border-b border-gray-700 hover:bg-base-300"
-                  >
-                    <td className="px-2 sm:px-4 py-4">{index + 1}</td>
-
-                    <td className="px-2 sm:px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={
-                            s.profile_image ||
-                            `https://ui-avatars.com/api/?name=${s.student}&background=random`
-                          }
-                          alt={s.student}
-                          className="w-8 h-8 rounded-full object-cover"
-                        />
-                        <span>{s.student}</span>
-                      </div>
-                    </td>
-
-                    <td className="px-2 sm:px-4 py-4">{s.email}</td>
-                    <td className="px-2 sm:px-4 py-4">{s.course}</td>
-                    <td className="px-2 sm:px-4 py-4">{s.applied_university}</td>
-
-                    <td className="px-2 sm:px-4 py-4">
-                      <button
-                        onClick={() => handleToggleStatus(s.id, s.status)}
-                        className={`${
-                          s.status
-                            ? "bg-blue-600 hover:bg-blue-700"
-                            : "bg-gray-600 hover:bg-gray-700"
-                        } text-white px-3 py-1 rounded-lg text-xs transition-colors`}
-                      >
-                        {s.status ? "Active" : "Inactive"}
-                      </button>
-                    </td>
-
-                    <td className="px-2 sm:px-4 py-4">
-                      <span
-                        className={`px-3 py-1 rounded-lg text-xs ${
-                          s.application === "Approved"
-                            ? "bg-blue-600 text-white"
-                            : s.application === "Pending"
-                            ? "bg-gray-600 text-white"
-                            : "bg-blue-600 text-white"
-                        }`}
-                      >
-                        {s.application}
-                      </span>
-                    </td>
-
-                    <td className="px-2 sm:px-4 py-4">{s.counselor}</td>
-
-                    <td className="px-2 sm:px-4 py-4">
-                      <div className="flex gap-3 text-sm">
-                        <button
-                          onClick={() => handleEditClick(s)}
-                          className="hover:text-blue-300 transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeleteStudent(s.id)}
-                          className="hover:text-red-300 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-700">
+                    {headers.map((h, i) => (
+                      <th key={i} className="px-2 sm:px-4 py-3 text-left text-sm font-medium text-gray-400">{h}</th>
+                    ))}
                   </tr>
-                )}
-              />
+                </thead>
+                <tbody>
+                  {filteredStudents.map((s, index) => (
+                    <tr key={s.id} className="border-b border-gray-700 hover:bg-base-300">
+                      <td className="px-2 sm:px-4 py-4">{index + 1}</td>
+                      <td className="px-2 sm:px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={s.profile_image || `https://ui-avatars.com/api/?name=${s.student}&background=random`}
+                            alt={s.student}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                          <span>{s.student}</span>
+                        </div>
+                      </td>
+                      <td className="px-2 sm:px-4 py-4">{s.email}</td>
+                      <td className="px-2 sm:px-4 py-4">{s.course}</td>
+                      <td className="px-2 sm:px-4 py-4">{s.applied_university}</td>
+                      <td className="px-2 sm:px-4 py-4">
+                        <button
+                          onClick={() => handleToggleStatus(s.id, s.status)}
+                          className={`${s.status ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-600 hover:bg-gray-700"} text-white px-3 py-1 rounded-lg text-xs transition-colors`}
+                        >
+                          {s.status ? "Active" : "Inactive"}
+                        </button>
+                      </td>
+                      <td className="px-2 sm:px-4 py-4">
+                        <span className={`px-3 py-1 rounded-lg text-xs ${s.application === "Pending" ? "bg-gray-600 text-white" : "bg-blue-600 text-white"}`}>
+                          {s.application}
+                        </span>
+                      </td>
+                      <td className="px-2 sm:px-4 py-4">{s.counselor}</td>
+                      <td className="px-2 sm:px-4 py-4">
+                        <div className="flex gap-3 text-sm">
+                          <button onClick={() => handleEditClick(s)} className="hover:text-blue-300 transition-colors">Edit</button>
+                          <button onClick={() => handleDeleteStudent(s.id)} className="hover:text-red-300 transition-colors">Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            {/* Mobile Cards */}
             <div className="md:hidden space-y-4">
               {filteredStudents.map((s) => (
                 <MobileCard
@@ -347,24 +245,13 @@ const Students = () => {
                     { label: "Email", value: s.email },
                     { label: "Course", value: s.course },
                     { label: "University", value: s.applied_university },
-                    {
-                      label: "Status",
-                      value: s.status ? "Active" : "Inactive",
-                    },
+                    { label: "Status", value: s.status ? "Active" : "Inactive" },
                     { label: "Application", value: s.application },
                     { label: "Counselor", value: s.counselor },
                   ]}
                   actions={[
-                    {
-                      label: "Edit",
-                      className: "text-blue-400 text-sm",
-                      onClick: () => handleEditClick(s),
-                    },
-                    {
-                      label: "Delete",
-                      className: "text-red-400 text-sm",
-                      onClick: () => handleDeleteStudent(s.id),
-                    },
+                    { label: "Edit", className: "text-blue-400 text-sm", onClick: () => handleEditClick(s) },
+                    { label: "Delete", className: "text-red-400 text-sm", onClick: () => handleDeleteStudent(s.id) },
                   ]}
                 />
               ))}
@@ -373,7 +260,7 @@ const Students = () => {
         )}
       </div>
 
-      {/* 🔹 Add Student Modal */}
+      {/* Add Student Modal */}
       <FormModal
         id="add_student_modal"
         title="Add Student"
@@ -381,24 +268,14 @@ const Students = () => {
         onSave={handleAddStudent}
       />
 
-      {/* 🔹 Edit Student Modal */}
-      {editingStudent && (
-        <FormModal
-          id="edit_student_modal"
-          title="Edit Student"
-          fields={studentFields}
-          onSave={handleUpdateStudent}
-          initialData={{
-            student: editingStudent.student,
-            email: editingStudent.email,
-            course: editingStudent.course,
-            applied_university: editingStudent.applied_university,
-            status: editingStudent.status ? "Active" : "Inactive",
-            application: editingStudent.application,
-            counselor: editingStudent.counselor,
-          }}
-        />
-      )}
+      {/* ✅ Edit Student Modal — using UpdateModal just like Universities page */}
+      <UpdateModal
+        id="edit_student_modal"
+        title="Edit Student"
+        fields={studentFields}
+        data={editingStudent}
+        onSave={handleUpdateStudent}
+      />
     </div>
   );
 };
