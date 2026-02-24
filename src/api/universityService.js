@@ -1,5 +1,6 @@
 import api from "./client";
 
+//create
 export const registerUniversity = async (data) => {
   const formData = new FormData();
 
@@ -22,11 +23,19 @@ export const registerUniversity = async (data) => {
   return response.data.data;
 };
 
+//get all
 export const getAllUniversity = async () => {
   const response = await api.get("/universities");
   return response.data.data;
 };
 
+//get with id
+export const getUniversity = async (data) => {
+  const response = await api.get(`/universities/${data.id}`);
+  return response.data.data;
+};
+
+//update
 export const updateUniversity = async (data) => {
   const formData = new FormData();
 
@@ -52,6 +61,7 @@ export const updateUniversity = async (data) => {
   return response.data.data;
 };
 
+//delete
 export const deleteUniversity = async (data) => {
   try {
     const response = await api.delete(`universities/${data.id}`);

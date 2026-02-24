@@ -18,6 +18,8 @@ import UpdateModal from "../components/modal/UpdateModal";
 const Universities = () => {
   const [universities, setUniversities] = useState([]);
   const [error, setError] = useState("");
+  const [selectedUni, setSelectedUni] = useState(null);
+  const [search, setSearch] = useState("");
 
   const headers = [
     "Logo",
@@ -76,8 +78,6 @@ const Universities = () => {
       options: ["Active", "Inactive"],
     },
   ];
-  const [selectedUni, setSelectedUni] = useState(null);
-  const [search, setSearch] = useState("");
 
   const handleAddUni = async (newUni) => {
     try {
@@ -105,6 +105,7 @@ const Universities = () => {
     Object.values(uni).join(" ").toLowerCase().includes(search.toLowerCase()),
   );
 
+  //get all uni
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
@@ -163,6 +164,9 @@ const Universities = () => {
   };
 
   const handleDeleteUni = async (uni) => {
+    if (!window.confirm("Are you sure you want to delete this student?")) {
+      return;
+    }
     try {
       await deleteUniversity({ id: uni.id });
 

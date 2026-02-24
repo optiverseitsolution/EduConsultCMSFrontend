@@ -7,7 +7,7 @@ const UpdateModal = ({ id, title, fields, data, onSave }) => {
 
   useEffect(() => {
     if (data) {
-      setFormData(data);
+      setFormData({ ...data });
     }
   }, [data]);
 
@@ -17,7 +17,6 @@ const UpdateModal = ({ id, title, fields, data, onSave }) => {
       [name]: value,
     }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
-    console.log(formData);
   };
 
   const handleSubmit = async (e) => {
@@ -28,9 +27,7 @@ const UpdateModal = ({ id, title, fields, data, onSave }) => {
     fields.forEach((field) => {
       const value = formData[field.name];
 
-      if (field.type === "file") {
-        return;
-      }
+      if (field.type === "file") return;
 
       if (field.type === "number") {
         if (value === "" || value === null || value === undefined) {
@@ -39,7 +36,8 @@ const UpdateModal = ({ id, title, fields, data, onSave }) => {
         if (value < 0) {
           newErrors[field.name] = `${field.label} cannot be negative`;
         }
-      } else if (!value) {
+      } else if (field.name !== "password" && !value) {
+      
         newErrors[field.name] = `${field.label} is required`;
       }
     });

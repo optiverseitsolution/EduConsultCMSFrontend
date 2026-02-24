@@ -1,45 +1,26 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
 import FormModal from "../components/modal/FormModal";
+import {
+  deleteUser,
+  getAllUsers,
+  registerUser,
+  updateUser,
+  updateUserStatus,
+} from "../api/userRolesService";
+import UpdateModal from "../components/modal/UpdateModal";
 
 const headers = ["S.N.", "User", "Email", "Role", "Status", "Actions"];
 
 const UsersRoles = () => {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      role: "Super Admin",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      role: "Admin",
-      status: "Active",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike@example.com",
-      role: "Counselor",
-      status: "Active",
-    },
-    {
-      id: 4,
-      name: "Sarah Williams",
-      email: "sarah@example.com",
-      role: "Manager",
-      status: "Inactive",
-    },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [query, setQuery] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
 
   /** Modal Fields */
   const userFields = [
@@ -49,6 +30,40 @@ const UsersRoles = () => {
       label: "Email",
       type: "email",
       placeholder: "john@example.com",
+    },
+    { name: "password", label: "Password", type: "password" },
+    {
+      name: "password_confirmation",
+      label: "Confirm Password",
+      type: "password",
+    },
+    {
+      name: "role",
+      label: "Role",
+      type: "select",
+      options: ["Super Admin", "Admin", "Manager", "Counselor"],
+    },
+    {
+      name: "status",
+      label: "Status",
+      type: "select",
+      options: ["Active", "Inactive"],
+    },
+  ];
+
+  const userUpdateFields = [
+    { name: "name", label: "Full Name", placeholder: "John Doe" },
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      placeholder: "john@example.com",
+    },
+    {
+      name: "password",
+      label: "Password",
+      type: "password",
+      placeholder: "",
     },
     {
       name: "role",
@@ -65,14 +80,33 @@ const UsersRoles = () => {
   ];
 
   /** Add User */
-  const handleAddUser = (newUser) => {
-    setUsers((prev) => [
-      ...prev,
-      {
-        id: prev.length ? Math.max(...prev.map((u) => u.id)) + 1 : 1,
+  const handleAddUser = async (newUser) => {
+    try {
+      const payload = {
         ...newUser,
-      },
-    ]);
+        status: newUser.status === "Active" ? "1" : "0",
+      };
+      const created = await registerUser(payload);
+
+      const formattedUser = {
+        id: created.id,
+        name: created.name,
+        email: created.email,
+        role: created.role,
+        status:
+          created.status === 0 || created.status === "0"
+            ? "Inactive"
+            : "Active",
+      };
+
+      setUsers((prev) => [...prev, formattedUser]);
+
+      setSuccess("User Created");
+      setError("");
+    } catch (err) {
+      setError("Error creating user");
+      throw err;
+    }
   };
 
   const filteredUsers = useMemo(() => {
@@ -80,7 +114,8 @@ const UsersRoles = () => {
     if (!q) return users;
 
     return users.filter((u) => {
-      const haystack = `${u.name} ${u.email} ${u.role} ${u.status}`.toLowerCase();
+      const haystack =
+        `${u.name} ${u.email} ${u.role} ${u.status}`.toLowerCase();
       return haystack.includes(q);
     });
   }, [users, query]);
@@ -88,6 +123,111 @@ const UsersRoles = () => {
   const openAddModal = () => {
     const el = document.getElementById("add_user_modal");
     if (el?.showModal) el.showModal();
+  };
+
+  //get all users
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const users = await getAllUsers();
+        const formattedUsers = users.map((item) => ({
+          id: item.id,
+          name: item.name,
+          email: item.email,
+          role: item.role,
+          status:
+            item.status === 0 || item.status === "0" ? "Inactive" : "Active",
+        }));
+        setUsers(formattedUsers);
+      } catch (err) {
+        throw err;
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  // delete users
+  const handleDeleteUser = async (user) => {
+    if (!window.confirm("Are you sure you want to delete this student?")) {
+      return;
+    }
+    try {
+      await deleteUser({ id: user.id });
+
+      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+    } catch (err) {
+      console.error("Failed to delete user", err);
+      alert("Failed to delete university. Please try again.");
+    }
+  };
+
+  //update
+  const handleEditUser = async (updatedData) => {
+    if (!selectedUser?.id) {
+      console.log("Missing ID:", selectedUser);
+      return;
+    }
+
+    try {
+      const payload = {
+        id: selectedUser.id,
+        name: updatedData.name,
+        email: updatedData.email,
+        role: updatedData.role,
+        status: updatedData.status === "Active" ? 1 : 0,
+        password: updatedData.password || undefined,
+      };
+
+      const updated = await updateUser(payload);
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === selectedUser.id
+            ? {
+                id: updated.id,
+                name: updated.name,
+                email: updated.email,
+                role: updated.role,
+                status:
+                  updated.status === 0 || updated.status === "0"
+                    ? "Inactive"
+                    : "Active",
+              }
+            : u,
+        ),
+      );
+
+      document.getElementById("update_user_modal").close();
+      setSelectedUser(null);
+      setSuccess("User Updated Successfully");
+      setError("");
+    } catch (err) {
+      console.log("Update error:", err.response?.data);
+      setError(err.response?.data?.message || "Update failed");
+    }
+  };
+
+  //status
+  const handleToggleStatus = async (userId, currentStatus) => {
+    try {
+      const statusNumber = currentStatus === "Active" ? 1 : 0;
+      const newStatus = statusNumber === 1 ? 0 : 1;
+
+      const updated = await updateUserStatus(userId, newStatus);
+
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === userId
+            ? { ...u, status: newStatus === 1 ? "Active" : "Inactive" }
+            : u,
+        ),
+      );
+      setSuccess("Status updated");
+      setError("");
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setError("Failed to update status. Please try again.");
+    }
   };
 
   return (
@@ -131,20 +271,27 @@ const UsersRoles = () => {
           </div>
         </div>
 
+        {error && <span className="text-red-500">{error}</span>}
+
+        {success && <span className="text-green-500">{success}</span>}
+
         {/* Desktop Table */}
         <div className="hidden md:block overflow-x-auto">
           <Table
             headers={headers}
             data={filteredUsers}
             renderRow={(u, index) => (
-              <tr key={u.id} className="border-b border-gray-700 hover:bg-base-300">
+              <tr
+                key={u.id}
+                className="border-b border-gray-700 hover:bg-base-300"
+              >
                 <td className="px-2 sm:px-4 py-4">{index + 1}</td>
 
                 <td className="px-2 sm:px-4 py-4">
                   <div className="flex items-center gap-3">
                     <img
                       src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        u.name
+                        u.name,
                       )}`}
                       alt={u.name}
                       className="w-8 h-8 rounded-full"
@@ -161,16 +308,17 @@ const UsersRoles = () => {
                   </span>
                 </td>
 
-                <td className="px-2 sm:px-4 py-4 text-center">
-                  <span
-                    className={`px-3 py-1 rounded-lg text-xs ${
+                <td className="px-2 sm:px-4 py-4">
+                  <button
+                    onClick={() => handleToggleStatus(u.id, u.status)}
+                    className={`${
                       u.status === "Active"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-600 text-gray-200"
-                    }`}
+                        ? "bg-blue-600 hover:bg-blue-700"
+                        : "bg-gray-600 hover:bg-gray-700"
+                    } text-white px-3 py-1 rounded-lg text-xs transition-colors`}
                   >
                     {u.status}
-                  </span>
+                  </button>
                 </td>
 
                 <td className="px-2 sm:px-4 py-4">
@@ -183,13 +331,18 @@ const UsersRoles = () => {
                     </button>
                     <button
                       className="hover:text-blue-300"
-                      onClick={() => console.log("Edit", u)}
+                      onClick={() => {
+                        setSelectedUser(u);
+                        document
+                          .getElementById("update_user_modal")
+                          .showModal();
+                      }}
                     >
                       Edit
                     </button>
                     <button
                       className="hover:text-red-300"
-                      onClick={() => console.log("Delete", u)}
+                      onClick={() => handleDeleteUser(u)}
                     >
                       Delete
                     </button>
@@ -220,7 +373,10 @@ const UsersRoles = () => {
                 {
                   label: "Edit",
                   className: "text-blue-400 text-sm",
-                  onClick: () => console.log("Edit", u),
+                  onClick: () => {
+                    setSelectedUser(u);
+                    document.getElementById("update_user_modal").showModal();
+                  },
                 },
                 {
                   label: "Delete",
@@ -243,6 +399,14 @@ const UsersRoles = () => {
         title="Add User"
         fields={userFields}
         onSave={handleAddUser}
+      />
+
+      <UpdateModal
+        id="update_user_modal"
+        title="Edit User"
+        fields={userUpdateFields}
+        data={selectedUser}
+        onSave={handleEditUser}
       />
     </div>
   );
