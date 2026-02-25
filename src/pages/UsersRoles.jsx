@@ -381,7 +381,7 @@ const UsersRoles = () => {
                 {
                   label: "Delete",
                   className: "text-red-400 text-sm",
-                  onClick: () => console.log("Delete", u),
+                  onClick: () => handleDeleteUser(u),
                 },
               ]}
             />

@@ -1,42 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
 import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
 import SeacrhModal from "../components/modal/SeacrhModal";
+import {
+  deletFeeStructure,
+  getAllFeeStructures,
+  registerFee,
+  updateFeeStructure,
+} from "../api/feeStructureService";
+import UpdateModal from "../components/modal/UpdateModal";
 
 const FeeStructure = () => {
-  const [fees, setFees] = useState([
-    {
-      id: 1,
-      consultancy: "ABC Education Consultancy",
-      feeType: "Application Fee",
-      amount: 500,
-      currency: "USD",
-    },
-    {
-      id: 2,
-      consultancy: "ABC Education Consultancy",
-      feeType: "Counseling Fee",
-      amount: 200,
-      currency: "USD",
-    },
-    {
-      id: 3,
-      consultancy: "Global Study Partners",
-      feeType: "Application Fee",
-      amount: 400,
-      currency: "GBP",
-    },
-    {
-      id: 4,
-      consultancy: "Global Study Partners",
-      feeType: "Document Verification",
-      amount: 150,
-      currency: "GBP",
-    },
-  ]);
+  const [fees, setFees] = useState([]);
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [selectedFee, setSelectedFee] = useState(null);
 
   const headers = [
     "ID",
@@ -48,12 +30,12 @@ const FeeStructure = () => {
   ];
   const feeFields = [
     {
-      name: "consultancy",
+      name: "consultancy_name",
       label: "Consultancy",
       placeholder: "Global Study Partners",
     },
     {
-      name: "feeType",
+      name: "fee_type",
       label: "Fee Type",
       type: "select",
       options: [
@@ -78,20 +60,80 @@ const FeeStructure = () => {
     },
   ];
 
-  const handleAddFee = (newFee) => {
-    setFees((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        ...newFee,
-      },
-    ]);
+  //create
+  const handleAddFee = async (newFee) => {
+    try {
+      const created = await registerFee(newFee);
+
+      setFees((prev) => [...prev, created]);
+      setSuccess("Fee added successfully");
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+      setSuccess("");
+    }
   };
 
-  const [search, setSearch] = useState("");
+  //getAll
+  useEffect(() => {
+    const fetchFee = async () => {
+      try {
+        const fees = await getAllFeeStructures();
+
+        const formattedFee = fees.map((fee) => ({
+          id: fee.id,
+          consultancy_name: fee.consultancy_name,
+          fee_type: fee.fee_type,
+          amount: fee.amount,
+          currency: fee.currency,
+        }));
+        setFees(formattedFee);
+      } catch (err) {
+        throw err;
+      }
+    };
+    fetchFee();
+  }, []);
+
+  //update
+  const handleEditFee = async (updatedData) => {
+    if (!selectedFee?.id) {
+      return;
+    }
+
+    try {
+      const updated = await updateFeeStructure(updatedData);
+      setFees((prev) =>
+        prev.map((fee) => (fee.id === selectedFee.id ? updated : fee)),
+      );
+      document.getElementById("update_fee_modal").close();
+      setSelectedFee(null);
+      setSuccess("Fee Updated Successfully");
+      setError("");
+    } catch (err) {
+      console.log("Update error:", err.response?.data);
+      setError(err.response?.data?.message || "Update failed");
+    }
+  };
+
+  //delete
+
+  const handleDeleteFee = async (fee) => {
+    if (!window.confirm("Are you sure you want to delete this fee structre?")) {
+      return;
+    }
+    try {
+      await deletFeeStructure({ id: fee.id });
+
+      setFees((prev) => prev.filter((u) => u.id !== fee.id));
+    } catch (err) {
+      console.error("Failed to delete user", err);
+      alert("Failed to delete FEE STRUCTURE. Please try again.");
+    }
+  };
 
   const filteredFee = fees.filter((fee) =>
-    Object.values(fee).join(" ").toLowerCase().includes(search.toLowerCase())
+    Object.values(fee).join(" ").toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -118,6 +160,10 @@ const FeeStructure = () => {
 
         <SeacrhModal placeholder="fees" onChange={setSearch} value={search} />
 
+        {error && <span className="text-red-500">{error}</span>}
+
+        {success && <span className="text-green-500">{success}</span>}
+
         <div className="overflow-x-auto hidden md:block">
           <Table
             headers={headers}
@@ -128,18 +174,31 @@ const FeeStructure = () => {
                 className="border-b border-gray-700 hover:bg-base-300"
               >
                 <td className="px-4 py-4">{fee.id}</td>
-                <td className="px-4 py-4">{fee.consultancy}</td>
+                <td className="px-4 py-4">{fee.consultancy_name}</td>
                 <td className="px-4 py-4">
                   <span className="bg-gray-800 px-3 py-1 rounded-full text-xs text-white">
-                    {fee.feeType}
+                    {fee.fee_type}
                   </span>
                 </td>
                 <td className="px-4 py-4 font-medium">{fee.amount}</td>
                 <td className="px-4 py-4">{fee.currency}</td>
                 <td className="px-4 py-4">
                   <div className="flex gap-4 text-sm">
-                    <button className="hover:text-blue-400">Edit</button>
-                    <button className="hover:text-red-400">Delete</button>
+                    <button
+                      className="hover:text-blue-400"
+                      onClick={() => {
+                        setSelectedFee(fee);
+                        document.getElementById("update_fee_modal").showModal();
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="hover:text-red-400"
+                      onClick={() => handleDeleteFee(fee)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -152,9 +211,9 @@ const FeeStructure = () => {
           {fees.map((fee) => (
             <MobileCard
               key={fee.id}
-              title={fee.consultancy}
+              title={fee.consultancy_name}
               fields={[
-                { label: "Fee Type", value: fee.feeType },
+                { label: "Fee Type", value: fee.fee_type },
                 { label: "Amount", value: fee.amount },
                 { label: "Currency", value: fee.currency },
               ]}
@@ -162,12 +221,15 @@ const FeeStructure = () => {
                 {
                   label: "Edit",
                   className: "text-blue-400 text-sm",
-                  onClick: () => console.log("Edit", fee),
+                  onClick: () => {
+                    setSelectedFee(fee);
+                    document.getElementById("update_fee_modal").showModal();
+                  },
                 },
                 {
                   label: "Delete",
                   className: "text-red-400 text-sm",
-                  onClick: () => console.log("Delete", fee),
+                  onClick: () => handleDeleteFee(fee),
                 },
               ]}
             />
@@ -179,6 +241,13 @@ const FeeStructure = () => {
         title="Add Fee Structure"
         fields={feeFields}
         onSave={handleAddFee}
+      />
+      <UpdateModal
+        id="update_fee_modal"
+        title="Edit Fee Structure"
+        fields={feeFields}
+        data={selectedFee}
+        onSave={handleEditFee}
       />
     </div>
   );
