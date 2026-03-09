@@ -18,6 +18,15 @@ export const getAllFeeStructures = async () => {
   }
 };
 
+export const getFeeStructure = async (data) => {
+  try {
+    const response = await api.get(`/fee-structures/${data.id}`);
+    return response.data.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const updateFeeStructure = async (data) => {
   try {
     const response = await api.put(`/fee-structures/${data.id}`, data);

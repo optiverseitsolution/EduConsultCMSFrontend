@@ -38,20 +38,33 @@ const Login = () => {
         password: data.password,
       });
 
-      const token = response.data.token;
+      console.log("Login response:", response);
+
+      const token = response?.data?.token || response?.token;
 
       if (!token) {
-        throw new Error("Token not received");
+        throw new Error("Token not received from server");
       }
 
       localStorage.setItem("authToken", token);
 
       navigate("/dashboard");
-
     } catch (error) {
-      setFormError(
-        error.response?.data?.message || "Invalid credentials"
-      );
+      let errorMessage = "Login failed";
+
+      if (error.response?.status === 401) {
+        errorMessage = "Invalid email or password";
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else if (error.code === "ECONNABORTED") {
+        errorMessage = "Request timeout - server not responding";
+      } else if (!error.response) {
+        errorMessage = "Network error - please check your connection";
+      }
+
+      setFormError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -60,7 +73,6 @@ const Login = () => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-base-100">
       <div className="w-full max-w-sm p-8 rounded-2xl bg-base-200/50 border border-gray-700">
-
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-600 rounded-lg text-white">
             <GraduationCap size={32} />
@@ -69,12 +81,9 @@ const Login = () => {
         </div>
 
         <h1 className="text-2xl font-black mb-2">Login</h1>
-        <p className="text-sm opacity-70 mb-6">
-          Sign in to your account
-        </p>
+        <p className="text-sm opacity-70 mb-6">Sign in to your account</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
           <input
             type="email"
             name="email"
@@ -102,9 +111,7 @@ const Login = () => {
             />
           </div>
 
-          {formError && (
-            <p className="text-red-500 text-sm">{formError}</p>
-          )}
+          {formError && <p className="text-red-500 text-sm">{formError}</p>}
 
           <button
             type="submit"
@@ -123,7 +130,6 @@ const Login = () => {
             </a>
           </p>
         </div>
-
       </div>
     </div>
   );

@@ -3,10 +3,26 @@ import StatCard from "../components/Statecard.jsx";
 import RecentApplications from "../components/RecentApplication.jsx";
 import TopUniversities from "../components/TopUniversities.jsx";
 import { Outlet, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getAllUniversity } from "../api/universityService.js";
 
 const Dashboard = () => {
   const location = useLocation();
-  const isDashboardHome = location.pathname === "/";
+  const isDashboardHome = location.pathname === "/dashboard";
+
+  const [uniCount, setUniCounnt] = useState();
+
+  useEffect(() => {
+    getAllUniversity().then((res) => {
+      if (res.message) {
+        setUniCounnt(res.message);
+      } else {
+        setUniCounnt(res.length);
+      }
+    });
+
+    
+  }, [uniCount]);
 
   return (
     <div className="flex min-h-screen">
@@ -25,7 +41,11 @@ const Dashboard = () => {
               <StatCard title="Total Students" value="1,248" change="+12.5%" />
               <StatCard title="Active Courses" value="156" change="+8.2%" />
               <StatCard title="Total Counselors" value="42" change="+3" />
-              <StatCard title="Total Universities" value="89" change="+5" />
+              <StatCard
+                title="Total Universities"
+                value={uniCount}
+                change="+5"
+              />
             </div>
 
             {/* Bottom Section */}

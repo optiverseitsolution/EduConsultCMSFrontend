@@ -109,16 +109,9 @@ const UsersRoles = () => {
     }
   };
 
-  const filteredUsers = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return users;
-
-    return users.filter((u) => {
-      const haystack =
-        `${u.name} ${u.email} ${u.role} ${u.status}`.toLowerCase();
-      return haystack.includes(q);
-    });
-  }, [users, query]);
+  const filteredUsers = users.filter((user) =>
+    Object.value(user).join(" ").toLowerCase().includes(query.toLowerCase()),
+  );
 
   const openAddModal = () => {
     const el = document.getElementById("add_user_modal");
@@ -156,7 +149,7 @@ const UsersRoles = () => {
 
       setUsers((prev) => prev.filter((u) => u.id !== user.id));
     } catch (err) {
-      console.error("Failed to delete user", err);
+
       alert("Failed to delete university. Please try again.");
     }
   };
@@ -164,7 +157,7 @@ const UsersRoles = () => {
   //update
   const handleEditUser = async (updatedData) => {
     if (!selectedUser?.id) {
-      console.log("Missing ID:", selectedUser);
+      setError("Missing ID");
       return;
     }
 
@@ -368,7 +361,10 @@ const UsersRoles = () => {
                 {
                   label: "View",
                   className: "text-blue-400 text-sm",
-                  onClick: () => console.log("View", u),
+                  onClick: () => {
+                    setSelectedUser(u);
+                    document.getElementById("view_user_modal").showModal();
+                  },
                 },
                 {
                   label: "Edit",
