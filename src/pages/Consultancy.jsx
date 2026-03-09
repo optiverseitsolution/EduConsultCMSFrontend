@@ -1,123 +1,130 @@
-import React, { useState } from "react";
-import { FaSearch } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
-import abc from "../assets/logos/abc.jpg";
 import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
 import ViewModal from "../components/modal/ViewModal";
 import SeacrhModal from "./../components/modal/SeacrhModal";
+import UpdateModal from "../components/modal/UpdateModal";
+import {
+  getAllConsultancies,
+  registerConsultancy,
+  updateConsultancy,
+  deleteConsultancy,
+} from "../api/consultancyService";
 
 const Consultancy = () => {
-  const [consultancies, setConsultancies] = useState([
-    {
-      id: 1,
-      logo: abc,
-      name: "ABC Education Consultancy",
-      email: "contact@abcedu.com",
-      phone: "+1-234-567-8900",
-      country: "USA",
-      serviceFee: 500,
-      currency: "USD",
-      students: 245,
-      status: "Active",
-    },
-    {
-      id: 2,
-      logo: abc,
-      name: "Global Study Partners",
-      email: "info@globalstudy.com",
-      phone: "+44-20-1234-5678",
-      country: "UK",
-      serviceFee: 400,
-      currency: "GBP",
-      students: 189,
-      status: "Active",
-    },
-  ]);
+  const [consultancies, setConsultancies] = useState([]);
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [selectedConsultancy, setSelectedConsultancy] = useState(null);
 
   const headers = [
-    "Logo",
-    "Consultancy Name",
-    "Email",
-    "Phone",
-    "Country",
-    "Service Fee",
-    "Currency",
-    "Students",
-    "Status",
-    "Actions",
+    "Logo", "Consultancy Name", "Email", "Phone", "Country", 
+    "Service Fee", "Currency", "Students", "Status", "Actions"
   ];
 
   const consultancyFields = [
-    {
-      name: "logo",
-      label: "Logo",
-      type: "file",
-    },
-    {
-      name: "name",
-      label: "Consultancy Name",
-      placeholder: "Global Study Partners",
-    },
-    {
-      name: "email",
-      label: "Email",
-      type: "email",
-      placeholder: "info@globalstudy.com",
-    },
-    {
-      name: "phone",
-      label: "Phone Number",
-      placeholder: "+44-20-1234-5678",
-      min: "0",
-    },
-    {
-      name: "country",
-      label: "Country",
-      type: "select",
-      options: ["UK", "USA", "Australia", "Canada", "Germany"],
-    },
-    {
-      name: "serviceFee",
-      label: "Service Fee",
-      type: "number",
-      placeholder: "400",
-      min: "0",
-    },
-    {
-      name: "currency",
-      label: "Currency",
-      type: "select",
-      options: ["GBP", "USD", "AUD", "EUR"],
-    },
-    {
-      name: "students",
-      label: "Students Enrolled",
-      type: "number",
-      placeholder: "189",
-      min: "0",
-    },
-    {
-      name: "status",
-      label: "Status",
-      type: "select",
-      options: ["Active", "Inactive"],
-    },
+    { name: "logo", label: "Logo", type: "file" },
+    { name: "consultancy_name", label: "Consultancy Name", placeholder: "Global Study Partners" },
+    { name: "email", label: "Email", type: "email", placeholder: "info@globalstudy.com" },
+    { name: "phone", label: "Phone Number", placeholder: "+44-20-1234-5678" },
+    { name: "country", label: "Country", type: "select", options: ["UK", "USA", "Australia", "Canada", "Germany"] },
+    { name: "service_fee", label: "Service Fee", type: "number", placeholder: "400", min: "0" },
+    { name: "currency", label: "Currency", type: "select", options: ["GBP", "USD", "AUD", "EUR"] },
+    { name: "students", label: "Students Enrolled", type: "number", placeholder: "189", min: "0" },
+    { name: "status", label: "Status", type: "select", options: ["0", "1"] },
   ];
-  const handleAddConsultancy = (newConsultancy) => {
-    setConsultancies((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        status: "Active",
-        ...newConsultancy,
-      },
-    ]);
+
+  // GET ALL
+  useEffect(() => {
+    const fetchConsultancies = async () => {
+      try {
+        const data = await getAllConsultancies();
+        setConsultancies(Array.isArray(data) ? data : [data]);
+      } catch (err) {
+        setError("Could not load consultancies.");
+      }
+    };
+    fetchConsultancies();
+  }, []);
+
+  // POST
+  const handleAddConsultancy = async (newConsultancyData) => {
+    try {
+      const formData = new FormData();
+      Object.keys(newConsultancyData).forEach((key) => {
+        formData.append(key, newConsultancyData[key]);
+      });
+
+      const created = await registerConsultancy(formData);
+      setConsultancies((prev) => [...prev, created]);
+      setSuccess("Consultancy added successfully!");
+      setError("");
+      document.getElementById("add_consultancy_modal").close();
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong adding it");
+    }
   };
 
-  const [selectedConsultancy, setSelectedConsultancy] = useState(null);
-  const [search, setSearch] = useState("");
+  // PUT (Fixed Method Spoofing logic)
+  const handleEditConsultancy = async (updatedData) => {
+    if (!selectedConsultancy?.id) return;
+
+    try {
+      const formData = new FormData();
+      
+      // CRITICAL: Tell the backend this is a PUT request
+      formData.append("_method", "PUT");
+
+      const fieldsToUpdate = [
+        "consultancy_name", "email", "phone", "country",
+        "service_fee", "currency", "students", "status"
+      ];
+
+      fieldsToUpdate.forEach((key) => {
+        formData.append(key, updatedData[key] ?? "");
+      });
+
+      // Only append logo if it's a new file upload
+      if (updatedData.logo instanceof File) {
+        formData.append("logo", updatedData.logo);
+      }
+
+      // Single API call handles everything including status
+      const updatedEntry = await updateConsultancy(selectedConsultancy.id, formData);
+
+      setConsultancies((prev) =>
+        prev.map((c) => (c.id === selectedConsultancy.id ? updatedEntry : c))
+      );
+
+      setSuccess("Consultancy updated successfully!");
+      setError("");
+      document.getElementById("update_c_modal").close();
+      
+      // Delay clearing the selection so the modal closes smoothly
+      setTimeout(() => setSelectedConsultancy(null), 300);
+      
+    } catch (err) {
+      console.error("Update error detail:", err.response?.data);
+      setError(err.response?.data?.message || "Update failed. Check required fields.");
+      setSuccess("");
+    }
+  };
+
+  // DELETE
+  const handleDeleteConsultancy = async (consultancy) => {
+    if (!window.confirm(`Are you sure you want to delete ${consultancy.consultancy_name}?`)) return;
+    try {
+      await deleteConsultancy(consultancy.id);
+      setConsultancies((prev) => prev.filter((c) => c.id !== consultancy.id));
+      setSuccess("Consultancy deleted.");
+      setError("");
+    } catch (err) {
+      setError("Failed to delete consultancy.");
+    }
+  };
 
   const filteredConsultancy = consultancies.filter((c) =>
     Object.values(c).join(" ").toLowerCase().includes(search.toLowerCase())
@@ -128,14 +135,10 @@ const Consultancy = () => {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold">Consultancy</h1>
-          <p className="text-gray-400">
-            Manage consultancy information and services
-          </p>
+          <p className="text-gray-400">Manage consultancy information and services</p>
         </div>
         <button
-          onClick={() =>
-            document.getElementById("add_consultancy_modal").showModal()
-          }
+          onClick={() => document.getElementById("add_consultancy_modal").showModal()}
           className="flex flex-row gap-2 items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full sm:w-auto hover:cursor-pointer"
         >
           <Plus size={18} /> Add Consultancy
@@ -143,131 +146,66 @@ const Consultancy = () => {
       </div>
 
       <div className="rounded-lg p-4 sm:p-6 border border-gray-400">
-        <h2 className="text-lg  font-semibold mb-2">All consultancies</h2>
-        <p className="text-gray-400 text-sm mb-4">
-          View and manage consultancy partnerships
-        </p>
-        {/* Search Bar */}
-        <SeacrhModal
-          placeholder="consultancies"
-          value={search}
-          onChange={setSearch}
-        />
-        {/* Table */}
-        <div className="overflow-x-auto">
+        <h2 className="text-lg font-semibold mb-2">All consultancies</h2>
+        <SeacrhModal placeholder="Search..." value={search} onChange={setSearch} />
+
+        {/* {error && <div className="text-red-500 my-4 bg-base-300 p-2 rounded">{error}</div>}
+        {success && <div className="text-green-500 my-4 bg-base-300 p-2 rounded">{success}</div>} */}
+
+        <div className="overflow-x-auto hidden md:block">
           <Table
             headers={headers}
             data={filteredConsultancy}
             renderRow={(c) => (
-              <tr
-                key={c.id}
-                className="border-b border-gray-700 hover:bg-base-300"
-              >
-                <td className="px-2 sm:px-4 ">
-                  <img
-                    src={c.logo}
-                    alt={c.name}
-                    className="w-8 rounded-lg object-cover"
-                  />
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.name}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.email}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.phone}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.country}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  ${c.serviceFee}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.currency}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.students}
-                </td>
-
-                <td className="px-2 sm:px-4 py-4">
-                  <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs">
-                    {c.status}
+              <tr key={c.id} className="border-b border-gray-700 hover:bg-base-300">
+                <td className="px-4 py-2"><img src={c.logo} className="w-10 h-10 rounded-lg object-cover" alt="" /></td>
+                <td className="px-4 py-4">{c.consultancy_name}</td>
+                <td className="px-4 py-4">{c.email}</td>
+                <td className="px-4 py-4">{c.phone}</td>
+                <td className="px-4 py-4">{c.country}</td>
+                <td className="px-4 py-4">{c.service_fee}</td>
+                <td className="px-4 py-4">{c.currency}</td>
+                <td className="px-4 py-4">{c.students}</td>
+                <td className="px-4 py-4">
+                  <span className={`px-3 py-1 rounded-lg text-xs text-white ${String(c.status) === "0" ? "bg-blue-600" : "bg-gray-600"}`}>
+                    {String(c.status) === "0" ? "Active" : "Inactive"}
                   </span>
                 </td>
-                <td className="px-2 sm:px-4 py-4">
-                  <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
-                    <button
-                      className="hover:text-blue-300 hover:cursor-pointer"
-                      onClick={() => {
-                        setSelectedConsultancy(c);
-                        document.getElementById("view_c_modal").showModal();
-                      }}
-                    >
-                      View
-                    </button>
-                    <button className="hover:text-blue-300">Edit</button>
-                    <button className="hover:text-red-300">Delete</button>
+                <td className="px-4 py-4">
+                  <div className="flex gap-4">
+                    <button className=" hover:underline hover:text-blue-300 " onClick={() => { setSelectedConsultancy(c); document.getElementById("view_c_modal").showModal(); }}>View</button>
+                    <button className="hover:underline hover:text-blue-300 " onClick={() => { setSelectedConsultancy(c); document.getElementById("update_c_modal").showModal(); }}>Edit</button>
+                    <button className=" hover:underline hover:text-red-300 " onClick={() => handleDeleteConsultancy(c)}>Delete</button>
                   </div>
                 </td>
               </tr>
             )}
           />
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-4">
-            {consultancies.map((c) => (
-              <MobileCard
-                key={c.id}
-                title={c.name}
-                image={c.logo}
-                fields={[
-                  { label: "Email", value: c.level },
-                  { label: "Phone", value: c.phone },
-                  { label: "Country", value: c.country },
-                  { label: "Service Fee", value: `$${c.serviceFee}` },
-                  { label: "Currency", value: c.currency },
-                  { label: "Students", value: c.students },
-                  { label: "Status", value: c.status },
-                ]}
-                actions={[
-                  {
-                    label: "View",
-                    className: "text-blue-400 text-sm",
-                    onClick: () => {
-                      setSelectedConsultancy(c);
-                      document.getElementById("view_c_modal").showModal();
-                    },
-                  },
-                  {
-                    label: "Edit",
-                    className: "text-blue-400 text-sm",
-                    onClick: () => console.log("Edit", c),
-                  },
-                  {
-                    label: "Delete",
-                    className: "text-red-400 text-sm",
-                    onClick: () => console.log("Delete", c),
-                  },
-                ]}
-              />
-            ))}
-          </div>
+        </div>
+
+        {/* Mobile View */}
+        <div className="md:hidden space-y-4">
+          {filteredConsultancy.map((c) => (
+            <MobileCard
+              key={c.id}
+              title={c.consultancy_name}
+              image={c.logo}
+              fields={[
+                { label: "Status", value: String(c.status) === "0" ? "Active" : "Inactive" },
+                { label: "Country", value: c.country }
+              ]}
+              actions={[
+                { label: "Edit", className: "text-yellow-400", onClick: () => { setSelectedConsultancy(c); document.getElementById("update_c_modal").showModal(); } },
+                { label: "Delete", className: "text-red-400", onClick: () => handleDeleteConsultancy(c) }
+              ]}
+            />
+          ))}
         </div>
       </div>
-      <FormModal
-        id="add_consultancy_modal"
-        title="Add Consultancy"
-        fields={consultancyFields}
-        onSave={handleAddConsultancy}
-      />
-      <ViewModal
-        id="view_c_modal"
-        title="Consultancy"
-        fields={consultancyFields}
-        data={selectedConsultancy}
-      />
+
+      <FormModal id="add_consultancy_modal" title="Add Consultancy" fields={consultancyFields} onSave={handleAddConsultancy} />
+      <ViewModal id="view_c_modal" title="Consultancy Details" fields={consultancyFields} data={selectedConsultancy} />
+      <UpdateModal id="update_c_modal" title="Edit Consultancy" fields={consultancyFields} data={selectedConsultancy} onSave={handleEditConsultancy} />
     </div>
   );
 };

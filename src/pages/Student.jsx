@@ -11,7 +11,7 @@ import {
   updateStudent,
   deleteStudent,
   updateStudentStatus,
-} from "../api/authService";
+} from "../api/studentService";
 
 const headers = [
   "S.N.",
