@@ -12,6 +12,7 @@ import {
   registerUniversity,
   updateUniversity,
   deleteUniversity,
+  updateUniversityStatus,
 } from "../api/universityService";
 import UpdateModal from "../components/modal/UpdateModal";
 
@@ -20,6 +21,7 @@ const Universities = () => {
   const [error, setError] = useState("");
   const [selectedUni, setSelectedUni] = useState(null);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const headers = [
     "Logo",
@@ -109,6 +111,7 @@ const Universities = () => {
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
+        setLoading(true);
         const uni = await getAllUniversity();
         const formattedUniversities = uni.map((item) => ({
           id: item.id,
@@ -119,11 +122,13 @@ const Universities = () => {
           partnerType: item.partner_type,
           programs: item.programs,
           applicationFee: item.application_fee.replace("$", ""),
-          status: item.status === "1" ? "Active" : "Inactive",
+          status: item.status === true ? "Active" : "Inactive",
         }));
         setUniversities(formattedUniversities);
       } catch (err) {
         setError(err.response?.data?.message || "Something went wrong");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -177,6 +182,26 @@ const Universities = () => {
     }
   };
 
+  //status
+  const handleToggleStatus = async (uniId, currentStatus) => {
+    try {
+      const newStatus = currentStatus === "Active" ? 0 : 1;
+      await updateUniversityStatus(uniId, newStatus);
+
+      setUniversities((prev) =>
+        prev.map((u) =>
+          u.id === uniId
+            ? { ...u, status: newStatus === 1 ? "Active" : "Inactive" }
+            : u,
+        ),
+      );
+      setSuccess("Status updated");
+      setError("");
+    } catch (err) {
+      setError("Failed to update status. Please try again.");
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -207,93 +232,106 @@ const Universities = () => {
         />
         {/* Table */}
         <div className="overflow-x-auto">
-          <Table
-            headers={headers}
-            data={filteredUni}
-            renderRow={(university) => (
-              <tr
-                key={university.id}
-                className="border-b border-gray-700 hover:bg-base-300"
-              >
-                <td className="px-2 sm:px-4 ">
-                  <img
-                    src={university.logo}
-                    alt={university.name}
-                    className="w-8 rounded-lg object-cover"
-                  />
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {university.name}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {university.country}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {university.city}
-                </td>
-                <td className="px-2 sm:px-4 py-4">
-                  {university.partnerType === "Partner" ? (
-                    <p className="bg-blue-600 rounded-lg w-fit px-3 py-1 text-xs text-white">
-                      {university.partnerType}
-                    </p>
-                  ) : (
-                    <p className="bg-gray-600 rounded-lg w-fit px-3 py-1 text-xs text-white">
-                      {university.partnerType}
-                    </p>
-                  )}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {university.programs}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  ${university.applicationFee}
-                </td>
-
-                <td className="px-2 sm:px-4 py-4">
-                  <span
-                    className={`px-3 py-1 rounded-lg text-xs text-white ${
-                      university.status === "Active"
-                        ? "bg-blue-600"
-                        : "bg-gray-600"
-                    }`}
+          {loading ? (
+            "Loading..."
+          ) : (
+            <>
+              <Table
+                headers={headers}
+                data={filteredUni}
+                renderRow={(university) => (
+                  <tr
+                    key={university.id}
+                    className="border-b border-gray-700 hover:bg-base-300"
                   >
-                    {university.status}
-                  </span>
-                </td>
-                <td className="px-2 sm:px-4 py-4">
-                  <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
-                    <button
-                      className="hover:text-blue-300 hover:cursor-pointer"
-                      onClick={() => {
-                        setSelectedUni(university);
-                        document.getElementById("view_uni_modal").showModal();
-                      }}
-                    >
-                      View
-                    </button>
-                    <button
-                      className="hover:text-blue-300"
-                      onClick={() => {
-                        setSelectedUni(university);
-                        document.getElementById("update_uni_modal").showModal();
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="hover:text-red-300"
-                      onClick={() => handleDeleteUni(university)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            )}
-          />
+                    <td className="px-2 sm:px-4 ">
+                      <img
+                        src={university.logo}
+                        alt={university.name}
+                        className="w-8 rounded-lg object-cover"
+                      />
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {university.name}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {university.country}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {university.city}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4">
+                      {university.partnerType === "Partner" ? (
+                        <p className="bg-blue-600 rounded-lg w-fit px-3 py-1 text-xs text-white">
+                          {university.partnerType}
+                        </p>
+                      ) : (
+                        <p className="bg-gray-600 rounded-lg w-fit px-3 py-1 text-xs text-white">
+                          {university.partnerType}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {university.programs}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      ${university.applicationFee}
+                    </td>
+
+                    <td className="px-2 sm:px-4 py-4">
+                      <button
+                        onClick={() =>
+                          handleToggleStatus(university.id, university.status)
+                        }
+                        className={`${
+                          university.status === "Active"
+                            ? "bg-blue-600 hover:bg-blue-700"
+                            : "bg-gray-600 hover:bg-gray-700"
+                        } text-white px-3 py-1 rounded-lg text-xs transition-colors`}
+                      >
+                        {university.status}
+                      </button>
+                    </td>
+                    <td className="px-2 sm:px-4 py-4">
+                      <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
+                        <button
+                          className="hover:text-blue-300 hover:cursor-pointer"
+                          onClick={() => {
+                            setSelectedUni(university);
+                            document
+                              .getElementById("view_uni_modal")
+                              .showModal();
+                          }}
+                        >
+                          View
+                        </button>
+                        <button
+                          className="hover:text-blue-300"
+                          onClick={() => {
+                            setSelectedUni(university);
+                            document
+                              .getElementById("update_uni_modal")
+                              .showModal();
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="hover:text-red-300"
+                          onClick={() => handleDeleteUni(university)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              />
+            </>
+          )}
           {/* Mobile Cards */}
           <div className="md:hidden space-y-4">
-            {universities.map((uni) => (
+            {filteredUni.map((uni) => (
               <MobileCard
                 key={uni.id}
                 title={uni.name}

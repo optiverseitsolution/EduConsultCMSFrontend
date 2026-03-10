@@ -20,6 +20,7 @@ const Courses = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
   const headers = [
@@ -71,7 +72,7 @@ const Courses = () => {
     try {
       const payload = {
         ...newCourse,
-        status: newCourse.status === "Active" ? "1" : "0",
+        status: newCourse.status === "Active" ? 1 : 0,
       };
 
       const created = await registerCourse(payload);
@@ -86,10 +87,7 @@ const Courses = () => {
         country: created.country,
         university: created.university,
         tuition_fee: created.tuition_fee,
-        status:
-          created.status === 0 || created.status === "0"
-            ? "Inactive"
-            : "Active",
+        status: created.status === 0 ? "Inactive" : "Active",
       };
 
       setCourses((prev) => [...prev, formattedStudent]);
@@ -113,7 +111,9 @@ const Courses = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
+        setLoading(true);
         const course = await getAllCourse();
+
         const formattedCourse = course.map((item) => ({
           id: item.id,
           course_name: item.course_name,
@@ -124,12 +124,13 @@ const Courses = () => {
           country: item.country,
           university: item.university,
           tuition_fee: Math.trunc(item.tuition_fee),
-          status:
-            item.status === 0 || item.status === "0" ? "Inactive" : "Active",
+          status: item.status === false ? "Inactive" : "Active",
         }));
         setCourses(formattedCourse);
       } catch (err) {
         throw err;
+      } finally {
+        setLoading(false);
       }
     };
     fetchCourse();
@@ -145,7 +146,7 @@ const Courses = () => {
     try {
       const payload = {
         ...updatedData,
-        status: updatedData.status === "Active" ? "1" : "0",
+        status: updatedData.status === "Active" ? 1 : 0,
       };
 
       const updated = await updateCourse(payload);
@@ -163,10 +164,7 @@ const Courses = () => {
                 country: updated.country,
                 university: updated.university,
                 tuition_fee: Math.trunc(updated.tuition_fee),
-                status:
-                  updated.status === "0" || updated.status === "0"
-                    ? "Inactive"
-                    : "Active",
+                status: updated.status === 0 ? "Inactive" : "Active",
               }
             : course,
         ),
@@ -196,6 +194,7 @@ const Courses = () => {
   };
 
   //update status
+
   const handleToggleStatus = async (courseId, currentStatus) => {
     try {
       const newStatus = currentStatus === "Active" ? 0 : 1;
@@ -208,6 +207,8 @@ const Courses = () => {
             : c,
         ),
       );
+
+      console.log(newStatus);
       setSuccess("Status updated");
       setError("");
     } catch (err) {
@@ -251,86 +252,94 @@ const Courses = () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <Table
-            headers={headers}
-            data={filteredCourses}
-            renderRow={(course) => (
-              <tr
-                key={course.id}
-                className="border-b border-gray-700 hover:bg-base-300"
-              >
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.course_name}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.level}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.field}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.duration} Years
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.intake}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.country}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {course.university}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  ${course.tuition_fee}/year
-                </td>
-                <td className="px-2 sm:px-4 py-4">
-                  <button
-                    onClick={() => handleToggleStatus(course.id, course.status)}
-                    className={`${
-                      course.status === "Active"
-                        ? "bg-blue-600 hover:bg-blue-700"
-                        : "bg-gray-600 hover:bg-gray-700"
-                    } text-white px-3 py-1 rounded-lg text-xs transition-colors`}
+          {loading ? (
+            "Loading..."
+          ) : (
+            <>
+              <Table
+                headers={headers}
+                data={filteredCourses}
+                renderRow={(course) => (
+                  <tr
+                    key={course.id}
+                    className="border-b border-gray-700 hover:bg-base-300"
                   >
-                    {course.status}
-                  </button>
-                </td>
-                <td className="px-2 sm:px-4 py-4">
-                  <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
-                    <button
-                      className="hover:text-blue-300 hover:cursor-pointer"
-                      onClick={() => {
-                        setSelectedCourse(course);
-                        document
-                          .getElementById("view_course_modal")
-                          .showModal();
-                      }}
-                    >
-                      View
-                    </button>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {course.course_name}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {course.level}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {course.field}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {course.duration} Years
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {course.intake}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {course.country}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      {course.university}
+                    </td>
+                    <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
+                      ${course.tuition_fee}/year
+                    </td>
+                    <td className="px-2 sm:px-4 py-4">
+                      <button
+                        onClick={() =>
+                          handleToggleStatus(course.id, course.status)
+                        }
+                        className={`${
+                          course.status === "Active"
+                            ? "bg-blue-600 hover:bg-blue-700"
+                            : "bg-gray-600 hover:bg-gray-700"
+                        } text-white px-3 py-1 rounded-lg text-xs transition-colors`}
+                      >
+                        {course.status}
+                      </button>
+                    </td>
+                    <td className="px-2 sm:px-4 py-4">
+                      <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
+                        <button
+                          className="hover:text-blue-300 hover:cursor-pointer"
+                          onClick={() => {
+                            setSelectedCourse(course);
+                            document
+                              .getElementById("view_course_modal")
+                              .showModal();
+                          }}
+                        >
+                          View
+                        </button>
 
-                    <button
-                      className="hover:text-blue-300"
-                      onClick={() => {
-                        setSelectedCourse(course);
-                        document
-                          .getElementById("update_course_modal")
-                          .showModal();
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="hover:text-red-300"
-                      onClick={() => handleDeletCourse(course)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            )}
-          />
+                        <button
+                          className="hover:text-blue-300"
+                          onClick={() => {
+                            setSelectedCourse(course);
+                            document
+                              .getElementById("update_course_modal")
+                              .showModal();
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="hover:text-red-300"
+                          onClick={() => handleDeletCourse(course)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              />
+            </>
+          )}
           {/* Mobile Cards */}
           <div className="md:hidden space-y-4">
             {courses.map((course) => (

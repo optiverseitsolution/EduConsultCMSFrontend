@@ -38,33 +38,17 @@ const Login = () => {
         password: data.password,
       });
 
-      console.log("Login response:", response);
-
-      const token = response?.data?.token || response?.token;
+      const token = response.data.token;
 
       if (!token) {
-        throw new Error("Token not received from server");
+        throw new Error("Token not received");
       }
 
       localStorage.setItem("authToken", token);
 
       navigate("/dashboard");
     } catch (error) {
-      let errorMessage = "Login failed";
-
-      if (error.response?.status === 401) {
-        errorMessage = "Invalid email or password";
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      } else if (error.code === "ECONNABORTED") {
-        errorMessage = "Request timeout - server not responding";
-      } else if (!error.response) {
-        errorMessage = "Network error - please check your connection";
-      }
-
-      setFormError(errorMessage);
+      setFormError(error.response?.data?.message || "Invalid credentials");
     } finally {
       setLoading(false);
     }

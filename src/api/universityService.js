@@ -71,3 +71,8 @@ export const deleteUniversity = async (data) => {
     throw error;
   }
 };
+
+//patch
+export const updateUniversityStatus = (uniId, status) => {
+  api.patch(`universities/${uniId}/status`, { status });
+};
