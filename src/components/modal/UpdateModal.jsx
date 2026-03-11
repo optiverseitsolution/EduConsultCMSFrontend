@@ -1,28 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const FormModal = ({ id, title, fields, onSave }) => {
+const UpdateModal = ({ id, title, fields = [], data = {}, onSave }) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
+  useEffect(() => {
+    setFormData(data ? { ...data } : {});
+    setErrors({});
+  }, [data]);
+
+  const closeDialog = () => {
+    const dialog = document.getElementById(id);
+    if (dialog && typeof dialog.close === "function") {
+      dialog.close();
+    }
   };
+
+  const handleChange = (name, value, type) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "number" && value !== "" ? Number(value) : value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+      general: "",
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let newErrors = {};
+    const newErrors = {};
 
     fields.forEach((field) => {
       const value = formData[field.name];
 
-      if (!value) {
-        newErrors[field.name] = `${field.label} is required`;
-      }
+      if (field.type === "file") return;
 
-      if (field.type === "number" && value < 0) {
-        newErrors[field.name] = `${field.label} cannot be negative`;
+      if (field.type === "number") {
+        if (value === "" || value === null || value === undefined || Number.isNaN(value)) {
+          newErrors[field.name] = `${field.label} is required`;
+        } else if (value < 0) {
+          newErrors[field.name] = `${field.label} cannot be negative`;
+        }
+      } else if (field.name !== "password" && !value?.toString().trim()) {
+        newErrors[field.name] = `${field.label} is required`;
       }
     });
 
@@ -35,13 +60,14 @@ const FormModal = ({ id, title, fields, onSave }) => {
       setLoading(true);
       await onSave(formData);
 
-      document.getElementById(id).close();
+      closeDialog();
       setFormData({});
       setErrors({});
-      // console.log(formData);
     } catch (err) {
-      if (err.response?.data?.errors) {
+      if (err?.response?.data?.errors) {
         setErrors(err.response.data.errors);
+      } else if (err?.message) {
+        setErrors({ general: err.message });
       } else {
         setErrors({ general: "Something went wrong" });
       }
@@ -49,44 +75,69 @@ const FormModal = ({ id, title, fields, onSave }) => {
       setLoading(false);
     }
   };
+
   return (
     <dialog id={id} className="modal">
       <div className="modal-box w-11/12 max-w-4xl">
         <div className="flex justify-between items-center border-b pb-3 mb-4">
           <h3 className="font-semibold text-lg">{title}</h3>
           <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost">✕</button>
+            <button className="btn btn-sm btn-circle btn-ghost" type="submit">
+              ✕
+            </button>
           </form>
         </div>
+
+        {errors.general && (
+          <p className="text-red-500 text-sm mb-4">{errors.general}</p>
+        )}
 
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
         >
-          {fields.map((field, index) => (
-            <div key={index}>
+          {fields.map((field) => (
+            <div key={field.name}>
               <label className="label font-medium">{field.label}</label>
 
               {field.type === "file" ? (
                 <>
-                  <label
-                    className={`flex items-center justify-between gap-4 input input-bordered w-full px-4 py-3 cursor-pointer
-                      ${errors[field.name] ? "border-red-500" : ""}`}
-                  >
-                    <span className="text-sm text-gray-500">
-                      {formData[field.name]?.name || "Choose file"}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    {formData[field.name] &&
+                      typeof formData[field.name] === "string" && (
+                        <img
+                          src={formData[field.name]}
+                          alt="Preview"
+                          className="mt-2 w-20 h-20 object-cover rounded"
+                        />
+                      )}
 
-                    <span className="btn btn-sm btn-outline">Browse</span>
+                    <label
+                      className={`flex items-center justify-between gap-4 input input-bordered w-full px-4 py-3 cursor-pointer ${
+                        errors[field.name] ? "border-red-500" : ""
+                      }`}
+                    >
+                      <span className="text-sm text-gray-500 truncate">
+                        {formData[field.name] instanceof File
+                          ? formData[field.name].name
+                          : typeof formData[field.name] === "string" && formData[field.name]
+                          ? "Current file selected"
+                          : "Choose file"}
+                      </span>
 
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) =>
-                        handleChange(field.name, e.target.files[0])
-                      }
-                    />
-                  </label>
+                      <span className="btn btn-sm btn-outline" type="button">
+                        Browse
+                      </span>
+
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) =>
+                          handleChange(field.name, e.target.files?.[0] || null, "file")
+                        }
+                      />
+                    </label>
+                  </div>
 
                   {errors[field.name] && (
                     <p className="text-red-500 text-xs mt-1">
@@ -102,7 +153,9 @@ const FormModal = ({ id, title, fields, onSave }) => {
                     }`}
                     value={formData[field.name] || ""}
                     placeholder={field.placeholder}
-                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    onChange={(e) =>
+                      handleChange(field.name, e.target.value, "textarea")
+                    }
                   />
 
                   {errors[field.name] && (
@@ -118,13 +171,18 @@ const FormModal = ({ id, title, fields, onSave }) => {
                       errors[field.name] ? "border-red-500" : ""
                     }`}
                     value={formData[field.name] || ""}
-                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    onChange={(e) =>
+                      handleChange(field.name, e.target.value, "select")
+                    }
                   >
                     <option value="">Select {field.label}</option>
 
                     {field.options?.map((option, index) => (
-                      <option key={index} value={option}>
-                        {option}
+                      <option
+                        key={typeof option === "object" ? option.value : index}
+                        value={typeof option === "object" ? option.value : option}
+                      >
+                        {typeof option === "object" ? option.label : option}
                       </option>
                     ))}
                   </select>
@@ -139,12 +197,14 @@ const FormModal = ({ id, title, fields, onSave }) => {
                 <>
                   <input
                     type={field.type || "text"}
-                    value={formData[field.name] || ""}
+                    value={formData[field.name] ?? ""}
                     placeholder={field.placeholder}
                     className={`input input-bordered w-full ${
                       errors[field.name] ? "border-red-500" : ""
                     }`}
-                    onChange={(e) => handleChange(field.name, e.target.value)}
+                    onChange={(e) =>
+                      handleChange(field.name, e.target.value, field.type)
+                    }
                   />
 
                   {errors[field.name] && (
@@ -161,7 +221,8 @@ const FormModal = ({ id, title, fields, onSave }) => {
             <button
               type="button"
               className="btn btn-ghost"
-              onClick={() => document.getElementById(id).close()}
+              onClick={closeDialog}
+              disabled={loading}
             >
               Cancel
             </button>
@@ -179,4 +240,4 @@ const FormModal = ({ id, title, fields, onSave }) => {
   );
 };
 
-export default FormModal;
+export default UpdateModal;

@@ -1,71 +1,137 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 import admin from "../assets/admin.jpg";
+import { getProfile, updateProfile } from "../api/authService";
 
 const AdminProfile = () => {
   const [editMode, setEditMode] = useState(false);
   const [editImg, setEditImg] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState("");
   const fileInputRef = useRef(null);
+
   const [preview, setPreview] = useState(admin);
 
   const [profile, setProfile] = useState({
-    fullname: "Admin User",
-    email: "admin@educonsult.com",
-    phone: "+1 234 567 890",
+    name: "",
+    email: "",
+    phone: "",
   });
 
+  // ==============================
+  // FETCH PROFILE
+  // ==============================
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setApiError("");
+
+        const response = await getProfile();
+
+        setProfile({
+          name: response?.data?.name || "",
+          email: response?.data?.email || "",
+          phone: response?.data?.phone || "",
+        });
+
+        // optional profile image if backend has one
+        if (response?.data?.image) {
+          setPreview(response.data.image);
+        }
+      } catch (error) {
+        setApiError(error?.response?.data?.message || "Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // ==============================
+  // HANDLE INPUT CHANGE
+  // ==============================
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProfile((prev) => ({ ...prev, [name]: value }));
+
+    setProfile((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+
+    setApiError("");
   };
 
-  const handleSave = () => {
-    let newErrors = {};
+  // ==============================
+  // SAVE PROFILE
+  // ==============================
+  const handleSave = async () => {
+    const newErrors = {};
 
-    if (!profile.fullname.trim()) {
-      newErrors.fullname = "Full name is required";
-    }
-
-    if (!profile.email.trim()) {
-      newErrors.email = "Email is required";
-    }
-
-    if (!profile.phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    }
-
-    if (profile.phone < 0) {
-      newErrors.phone = "Phone number cannot be negative";
-    }
+    if (!profile.name.trim()) newErrors.name = "Full name required";
+    if (!profile.email.trim()) newErrors.email = "Email required";
+    if (!profile.phone.trim()) newErrors.phone = "Phone required";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    setErrors({});
-    setEditMode(false);
+    try {
+      setLoading(true);
+      setApiError("");
+
+      await updateProfile({
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+      });
+
+      setEditMode(false);
+      setErrors({});
+    } catch (error) {
+      setApiError(error?.response?.data?.message || "Profile update failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // ==============================
+  // IMAGE HANDLING (Frontend only)
+  // ==============================
   const handleClick = () => {
-    fileInputRef.current.click();
+    fileInputRef.current?.click();
   };
+
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image");
+      setApiError("Please select a valid image file");
       return;
     }
+
+    setApiError("");
 
     const imageURL = URL.createObjectURL(file);
     setPreview(imageURL);
   };
 
+  if (loading) {
+    return <div className="text-center p-10">Loading profile...</div>;
+  }
+
   return (
     <div className="flex flex-col gap-6">
+      {apiError && <div className="text-red-500">{apiError}</div>}
+
       <div>
         <h1 className="text-2xl font-bold">Admin Profile</h1>
         <p className="text-gray-400">
@@ -73,10 +139,10 @@ const AdminProfile = () => {
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 p-6 bg-base-300 border border-base-content/20 rounded-xl">
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-6 p-6 bg-base-300 border border-base-content/20 rounded-xl">
+        <div className="flex flex-col sm:flex-row items-center gap-4">
           <div
-            className="flex relative"
+            className="relative cursor-pointer"
             onMouseEnter={() => setEditImg(true)}
             onMouseLeave={() => setEditImg(false)}
             onClick={handleClick}
@@ -84,13 +150,15 @@ const AdminProfile = () => {
             <img
               src={preview}
               alt="Admin"
-              className="md:w-28 h-28 rounded-full border-4 border-base-content/10"
+              className="w-28 h-28 rounded-full border-4 border-base-content/10 object-cover"
             />
+
             {editImg && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white font-medium cursor-pointer">
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white text-sm">
                 Choose Photo
               </div>
             )}
+
             <input
               type="file"
               ref={fileInputRef}
@@ -101,15 +169,19 @@ const AdminProfile = () => {
           </div>
 
           <div className="flex flex-col items-center sm:items-start">
-            <h2 className="text-2xl font-bold">{profile.fullname}</h2>
+            <h2 className="text-2xl font-bold">{profile.name}</h2>
             <p className="text-gray-400">Role: Super Admin</p>
             <p className="text-gray-400">Email: {profile.email}</p>
+            {profile.phone && (
+              <p className="text-gray-400">Phone: {profile.phone}</p>
+            )}
           </div>
         </div>
 
         <button
           className="btn btn-outline btn-sm gap-2"
-          onClick={() => setEditMode(!editMode)}
+          onClick={() => setEditMode((prev) => !prev)}
+          disabled={loading}
         >
           {editMode ? (
             <>
@@ -123,36 +195,35 @@ const AdminProfile = () => {
         </button>
       </div>
 
-      {/* Edit Admin Profile */}
       {editMode && (
-        <div className="bg-base-300 border border-base-content/20 rounded-xl p-6">
-          <div className="flex flex-col gap-6 w-full sm:w-1/2">
+        <div className="bg-base-300 border rounded-xl p-6">
+          <div className="flex flex-col gap-4 w-full sm:w-1/2">
             <div>
-              <label className="label">
-                <span className="label-text font-medium">Full Name</span>
-              </label>
+              <label className="font-medium">Full Name</label>
               <input
                 type="text"
-                name="fullname"
-                value={profile.fullname}
+                name="name"
+                value={profile.name}
                 onChange={handleChange}
-                className="input input-bordered w-full"
+                className={`input input-bordered w-full ${
+                  errors.name ? "border-red-500" : ""
+                }`}
               />
-              {errors.fullname && (
-                <p className="text-error text-sm mt-1">{errors.fullname}</p>
+              {errors.name && (
+                <p className="text-error text-sm mt-1">{errors.name}</p>
               )}
             </div>
 
             <div>
-              <label className="label">
-                <span className="label-text font-medium">Email Address</span>
-              </label>
+              <label className="font-medium">Email</label>
               <input
                 type="email"
                 name="email"
                 value={profile.email}
                 onChange={handleChange}
-                className="input input-bordered w-full"
+                className={`input input-bordered w-full ${
+                  errors.email ? "border-red-500" : ""
+                }`}
               />
               {errors.email && (
                 <p className="text-error text-sm mt-1">{errors.email}</p>
@@ -160,41 +231,39 @@ const AdminProfile = () => {
             </div>
 
             <div>
-              <label className="label">
-                <span className="label-text font-medium">Phone Number</span>
-              </label>
+              <label className="font-medium">Phone</label>
               <input
                 type="text"
                 name="phone"
                 value={profile.phone}
                 onChange={handleChange}
-                className="input input-bordered w-full"
+                className={`input input-bordered w-full ${
+                  errors.phone ? "border-red-500" : ""
+                }`}
               />
               {errors.phone && (
                 <p className="text-error text-sm mt-1">{errors.phone}</p>
               )}
             </div>
-
-            <div className="flex flex-col justify-end">
-              <label className="label">
-                <span className="label-text font-medium">Security</span>
-              </label>
-              <button className="btn btn-outline w-fit max-sm:w-full">
-                Change Password
-              </button>
-            </div>
           </div>
 
-          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+          <div className="mt-6 flex gap-3">
             <button
-              className="btn bg-blue-600 w-full sm:w-auto"
+              className="btn bg-blue-600 text-white"
               onClick={handleSave}
+              disabled={loading}
             >
-              Save Changes
+              {loading ? "Saving..." : "Save Changes"}
             </button>
+
             <button
-              className="btn btn-ghost w-full sm:w-auto"
-              onClick={() => setEditMode(false)}
+              className="btn btn-ghost"
+              onClick={() => {
+                setEditMode(false);
+                setErrors({});
+                setApiError("");
+              }}
+              disabled={loading}
             >
               Cancel
             </button>
