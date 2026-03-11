@@ -18,7 +18,7 @@ function App() {
   return (
     <Routes>
       {/* Authentication - Index Route */}
-      <Route index element={<Register />} />
+      <Route index element={<Login />} />
       <Route path="/register" element={<Register />} />
  
       <Route path="login" element={<Login />} />
