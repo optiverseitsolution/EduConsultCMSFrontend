@@ -1,40 +1,25 @@
-import React, { useState } from "react";
-import { FaSearch } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
 import Table from "../components/Table";
 import MobileCard from "../components/MobileCard";
-import abc from "../assets/logos/abc.jpg";
 import { Plus } from "lucide-react";
 import FormModal from "../components/modal/FormModal";
 import ViewModal from "../components/modal/ViewModal";
 import SeacrhModal from "./../components/modal/SeacrhModal";
+import UpdateModal from "../components/modal/UpdateModal";
+import {
+  getAllConsultancies,
+  registerConsultancy,
+  updateConsultancy,
+  deleteConsultancy,
+} from "../api/consultancyService";
 
 const Consultancy = () => {
-  const [consultancies, setConsultancies] = useState([
-    {
-      id: 1,
-      logo: abc,
-      name: "ABC Education Consultancy",
-      email: "contact@abcedu.com",
-      phone: "+1-234-567-8900",
-      country: "USA",
-      serviceFee: 500,
-      currency: "USD",
-      students: 245,
-      status: "Active",
-    },
-    {
-      id: 2,
-      logo: abc,
-      name: "Global Study Partners",
-      email: "info@globalstudy.com",
-      phone: "+44-20-1234-5678",
-      country: "UK",
-      serviceFee: 400,
-      currency: "GBP",
-      students: 189,
-      status: "Active",
-    },
-  ]);
+  const [consultancies, setConsultancies] = useState([]);
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [selectedConsultancy, setSelectedConsultancy] = useState(null);
+  const [editingConsultancy, setEditingConsultancy] = useState(null);
 
   const headers = [
     "Logo",
@@ -50,13 +35,9 @@ const Consultancy = () => {
   ];
 
   const consultancyFields = [
+    { name: "logo", label: "Logo", type: "file" },
     {
-      name: "logo",
-      label: "Logo",
-      type: "file",
-    },
-    {
-      name: "name",
+      name: "consultancy_name",
       label: "Consultancy Name",
       placeholder: "Global Study Partners",
     },
@@ -66,12 +47,7 @@ const Consultancy = () => {
       type: "email",
       placeholder: "info@globalstudy.com",
     },
-    {
-      name: "phone",
-      label: "Phone Number",
-      placeholder: "+44-20-1234-5678",
-      min: "0",
-    },
+    { name: "phone", label: "Phone Number", placeholder: "+44-20-1234-5678" },
     {
       name: "country",
       label: "Country",
@@ -79,7 +55,7 @@ const Consultancy = () => {
       options: ["UK", "USA", "Australia", "Canada", "Germany"],
     },
     {
-      name: "serviceFee",
+      name: "service_fee",
       label: "Service Fee",
       type: "number",
       placeholder: "400",
@@ -105,22 +81,146 @@ const Consultancy = () => {
       options: ["Active", "Inactive"],
     },
   ];
-  const handleAddConsultancy = (newConsultancy) => {
-    setConsultancies((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        status: "Active",
-        ...newConsultancy,
-      },
-    ]);
+
+  // ✅ Handles ALL formats the API returns:
+  // GET all  → status: false / true  (boolean)
+  // GET single / PUT response → status: "0" / "1"  (string)
+  // Active = false / "0" / 0
+  // Inactive = true / "1" / 1
+  const isActive = (status) => {
+    if (status === false || status === "false") return true; // boolean false = Active
+    if (status === true || status === "true") return false; // boolean true  = Inactive
+    return String(status) === "0"; // "0" = Active, "1" = Inactive
   };
 
-  const [selectedConsultancy, setSelectedConsultancy] = useState(null);
-  const [search, setSearch] = useState("");
+  // Map any status value → "Active" or "Inactive" label for the dropdown
+  const mapStatusToLabel = (status) =>
+    isActive(status) ? "Active" : "Inactive";
+
+  // Map dropdown label → "0"/"1" string the API expects on POST/PUT
+  const mapStatusToValue = (status) => {
+    if (status === "Active") return "0";
+    if (status === "Inactive") return "1";
+    return status;
+  };
+
+  // GET ALL
+  useEffect(() => {
+    const fetchConsultancies = async () => {
+      try {
+        const data = await getAllConsultancies();
+        setConsultancies(Array.isArray(data) ? data : [data]);
+      } catch (err) {
+        setError("Could not load consultancies.");
+      }
+    };
+    fetchConsultancies();
+  }, []);
+
+  // POST
+  const handleAddConsultancy = async (newConsultancyData) => {
+    try {
+      const formData = new FormData();
+      Object.keys(newConsultancyData).forEach((key) => {
+        const value =
+          key === "status"
+            ? mapStatusToValue(newConsultancyData[key])
+            : newConsultancyData[key];
+        formData.append(key, value);
+      });
+
+      const created = await registerConsultancy(formData);
+      setConsultancies((prev) => [...prev, created]);
+      setSuccess("Consultancy added successfully!");
+      setError("");
+      document.getElementById("add_consultancy_modal").close();
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong adding it");
+    }
+  };
+
+  // Open edit modal — convert status to label for dropdown, stored in separate state
+  const handleEditClick = (c) => {
+    setEditingConsultancy({
+      ...c,
+      status: mapStatusToLabel(c.status),
+    });
+    document.getElementById("update_c_modal").showModal();
+  };
+
+  // PUT
+  const handleEditConsultancy = async (updatedData) => {
+    if (!editingConsultancy?.id) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("_method", "PUT");
+
+      const fieldsToUpdate = [
+        "consultancy_name",
+        "email",
+        "phone",
+        "country",
+        "service_fee",
+        "currency",
+        "students",
+        "status",
+      ];
+
+      fieldsToUpdate.forEach((key) => {
+        const value =
+          key === "status"
+            ? mapStatusToValue(updatedData[key] ?? "")
+            : (updatedData[key] ?? "");
+        formData.append(key, value);
+      });
+
+      if (updatedData.logo instanceof File) {
+        formData.append("logo", updatedData.logo);
+      }
+
+      const updatedEntry = await updateConsultancy(
+        editingConsultancy.id,
+        formData,
+      );
+
+      setConsultancies((prev) =>
+        prev.map((c) => (c.id === editingConsultancy.id ? updatedEntry : c)),
+      );
+
+      setSuccess("Consultancy updated successfully!");
+      setError("");
+      document.getElementById("update_c_modal").close();
+      setTimeout(() => setEditingConsultancy(null), 300);
+    } catch (err) {
+      console.error("Update error detail:", err.response?.data);
+      setError(
+        err.response?.data?.message || "Update failed. Check required fields.",
+      );
+      setSuccess("");
+    }
+  };
+
+  // DELETE
+  const handleDeleteConsultancy = async (consultancy) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${consultancy.consultancy_name}?`,
+      )
+    )
+      return;
+    try {
+      await deleteConsultancy(consultancy.id);
+      setConsultancies((prev) => prev.filter((c) => c.id !== consultancy.id));
+      setSuccess("Consultancy deleted.");
+      setError("");
+    } catch (err) {
+      setError("Failed to delete consultancy.");
+    }
+  };
 
   const filteredConsultancy = consultancies.filter((c) =>
-    Object.values(c).join(" ").toLowerCase().includes(search.toLowerCase())
+    Object.values(c).join(" ").toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -143,18 +243,15 @@ const Consultancy = () => {
       </div>
 
       <div className="rounded-lg p-4 sm:p-6 border border-gray-400">
-        <h2 className="text-lg  font-semibold mb-2">All consultancies</h2>
-        <p className="text-gray-400 text-sm mb-4">
-          View and manage consultancy partnerships
-        </p>
-        {/* Search Bar */}
+        <h2 className="text-lg font-semibold mb-2">All consultancies</h2>
         <SeacrhModal
-          placeholder="consultancies"
+          placeholder="Search..."
           value={search}
           onChange={setSearch}
         />
-        {/* Table */}
-        <div className="overflow-x-auto">
+
+        {/* Desktop Table */}
+        <div className="overflow-x-auto hidden md:block">
           <Table
             headers={headers}
             data={filteredConsultancy}
@@ -163,44 +260,31 @@ const Consultancy = () => {
                 key={c.id}
                 className="border-b border-gray-700 hover:bg-base-300"
               >
-                <td className="px-2 sm:px-4 ">
+                <td className="px-4 py-2">
                   <img
                     src={c.logo}
-                    alt={c.name}
-                    className="w-8 rounded-lg object-cover"
+                    className="w-10 h-10 rounded-lg object-cover"
+                    alt=""
                   />
                 </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.name}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.email}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.phone}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.country}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  ${c.serviceFee}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.currency}
-                </td>
-                <td className="px-2 sm:px-4 py-4 text-sm sm:text-base">
-                  {c.students}
-                </td>
-
-                <td className="px-2 sm:px-4 py-4">
-                  <span className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs">
-                    {c.status}
+                <td className="px-4 py-4">{c.consultancy_name}</td>
+                <td className="px-4 py-4">{c.email}</td>
+                <td className="px-4 py-4">{c.phone}</td>
+                <td className="px-4 py-4">{c.country}</td>
+                <td className="px-4 py-4">{c.service_fee}</td>
+                <td className="px-4 py-4">{c.currency}</td>
+                <td className="px-4 py-4">{c.students}</td>
+                <td className="px-4 py-4">
+                  <span
+                    className={`px-3 py-1 rounded-lg text-xs text-white ${isActive(c.status) ? "bg-blue-600" : "bg-gray-600"}`}
+                  >
+                    {isActive(c.status) ? "Active" : "Inactive"}
                   </span>
                 </td>
-                <td className="px-2 sm:px-4 py-4">
-                  <div className="flex gap-2 sm:gap-4 text-xs sm:text-base">
+                <td className="px-4 py-4">
+                  <div className="flex gap-4">
                     <button
-                      className="hover:text-blue-300 hover:cursor-pointer"
+                      className="hover:underline hover:text-blue-300"
                       onClick={() => {
                         setSelectedConsultancy(c);
                         document.getElementById("view_c_modal").showModal();
@@ -208,54 +292,56 @@ const Consultancy = () => {
                     >
                       View
                     </button>
-                    <button className="hover:text-blue-300">Edit</button>
-                    <button className="hover:text-red-300">Delete</button>
+                    <button
+                      className="hover:underline hover:text-blue-300"
+                      onClick={() => handleEditClick(c)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="hover:underline hover:text-red-300"
+                      onClick={() => handleDeleteConsultancy(c)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
             )}
           />
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-4">
-            {consultancies.map((c) => (
-              <MobileCard
-                key={c.id}
-                title={c.name}
-                image={c.logo}
-                fields={[
-                  { label: "Email", value: c.level },
-                  { label: "Phone", value: c.phone },
-                  { label: "Country", value: c.country },
-                  { label: "Service Fee", value: `$${c.serviceFee}` },
-                  { label: "Currency", value: c.currency },
-                  { label: "Students", value: c.students },
-                  { label: "Status", value: c.status },
-                ]}
-                actions={[
-                  {
-                    label: "View",
-                    className: "text-blue-400 text-sm",
-                    onClick: () => {
-                      setSelectedConsultancy(c);
-                      document.getElementById("view_c_modal").showModal();
-                    },
-                  },
-                  {
-                    label: "Edit",
-                    className: "text-blue-400 text-sm",
-                    onClick: () => console.log("Edit", c),
-                  },
-                  {
-                    label: "Delete",
-                    className: "text-red-400 text-sm",
-                    onClick: () => console.log("Delete", c),
-                  },
-                ]}
-              />
-            ))}
-          </div>
+        </div>
+
+        {/* Mobile View */}
+        <div className="md:hidden space-y-4">
+          {filteredConsultancy.map((c) => (
+            <MobileCard
+              key={c.id}
+              title={c.consultancy_name}
+              image={c.logo}
+              fields={[
+                {
+                  label: "Status",
+                  value: isActive(c.status) ? "Active" : "Inactive",
+                },
+                { label: "Country", value: c.country },
+              ]}
+              actions={[
+                {
+                  label: "Edit",
+                  className: "text-yellow-400",
+                  onClick: () => handleEditClick(c),
+                },
+                {
+                  label: "Delete",
+                  className: "text-red-400",
+                  onClick: () => handleDeleteConsultancy(c),
+                },
+              ]}
+            />
+          ))}
         </div>
       </div>
+
       <FormModal
         id="add_consultancy_modal"
         title="Add Consultancy"
@@ -264,9 +350,16 @@ const Consultancy = () => {
       />
       <ViewModal
         id="view_c_modal"
-        title="Consultancy"
+        title="Consultancy Details"
         fields={consultancyFields}
         data={selectedConsultancy}
+      />
+      <UpdateModal
+        id="update_c_modal"
+        title="Edit Consultancy"
+        fields={consultancyFields}
+        data={editingConsultancy}
+        onSave={handleEditConsultancy}
       />
     </div>
   );

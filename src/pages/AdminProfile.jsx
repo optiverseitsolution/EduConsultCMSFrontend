@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 import admin from "../assets/admin.jpg";
 import { getProfile, updateProfile } from "../api/authService";
@@ -12,7 +13,10 @@ const AdminProfile = () => {
   const fileInputRef = useRef(null);
 
   const [preview, setPreview] = useState(admin);
+  
+  const [loading, setLoading] = useState(true);
 
+  // 2. We start with empty strings (or fallbacks) instead of fake data
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -160,17 +164,29 @@ const AdminProfile = () => {
             />
           </div>
 
-          {/* Profile Info */}
-          <div>
-            <h2 className="text-2xl font-bold">{profile.name}</h2>
-            <p className="text-gray-400">Role: Super Admin</p>
-            <p className="text-gray-400">Email: {profile.email}</p>
+          <div className="flex flex-col items-center sm:items-start">
+            {/* Show a loading message while waiting for the postman */}
+            {loading ? (
+              <div className="animate-pulse">
+                <div className="h-6 w-32 bg-gray-500 rounded mb-2"></div>
+                <div className="h-4 w-48 bg-gray-500 rounded"></div>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold">{profile.fullname}</h2>
+                <p className="text-gray-400">Role: Super Admin</p>
+                <p className="text-gray-400">Email: {profile.email}</p>
+                {/* Optional: Show phone number if you want */}
+                {profile.phone && <p className="text-gray-400">Phone: {profile.phone}</p>}
+              </>
+            )}
           </div>
         </div>
 
         <button
           className="btn btn-outline btn-sm gap-2"
           onClick={() => setEditMode(!editMode)}
+          disabled={loading} // Don't allow editing until data loads!
         >
           {editMode ? (
             <>
