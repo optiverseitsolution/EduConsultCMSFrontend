@@ -3,6 +3,8 @@
   color: #1f2937;
   background: #f8fafc;
   min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .navbar {
@@ -16,17 +18,20 @@
   position: sticky;
   top: 0;
   z-index: 999;
+  gap: 20px;
 }
 
 .logo h2 {
   color: #2563eb;
   font-size: 28px;
   font-weight: 700;
+  margin: 0;
 }
 
 .navLinks {
   display: flex;
   gap: 28px;
+  flex-wrap: wrap;
 }
 
 .navLinks a {
@@ -43,6 +48,7 @@
 .authButtons {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .btn {
@@ -51,7 +57,11 @@
   text-decoration: none;
   font-weight: 600;
   transition: 0.3s ease;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .btnPrimary {
@@ -93,6 +103,7 @@
 
 .heroLeft {
   flex: 1;
+  min-width: 0;
 }
 
 .badge {
@@ -131,6 +142,7 @@
   flex: 1;
   display: flex;
   justify-content: center;
+  min-width: 0;
 }
 
 .heroCard {
@@ -255,14 +267,26 @@
   flex-wrap: wrap;
 }
 
+/* laptop / tablet */
 @media (max-width: 1024px) {
-  .featuresGrid {
-    grid-template-columns: repeat(2, 1fr);
+  .navbar {
+    padding: 18px 32px;
+  }
+
+  .hero,
+  .features,
+  .about,
+  .contact {
+    padding-left: 32px;
+    padding-right: 32px;
   }
 
   .hero {
     flex-direction: column;
     text-align: center;
+    min-height: auto;
+    padding-top: 60px;
+    padding-bottom: 60px;
   }
 
   .heroLeft p {
@@ -273,32 +297,184 @@
   .heroButtons {
     justify-content: center;
   }
+
+  .featuresGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
+/* mobile */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
-    gap: 18px;
-    padding: 20px;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px 20px;
+  }
+
+  .logo {
+    text-align: center;
+  }
+
+  .logo h2 {
+    font-size: 24px;
   }
 
   .navLinks {
-    flex-wrap: wrap;
     justify-content: center;
+    gap: 16px;
+  }
+
+  .navLinks a {
+    font-size: 14px;
+  }
+
+  .authButtons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .authButtons .btn {
+    flex: 1;
+    min-width: 130px;
   }
 
   .hero,
   .features,
   .about,
   .contact {
-    padding: 50px 20px;
+    padding: 44px 20px;
+  }
+
+  .hero {
+    gap: 32px;
+  }
+
+  .badge {
+    font-size: 12px;
+    padding: 7px 14px;
   }
 
   .heroLeft h1 {
-    font-size: 36px;
+    font-size: 34px;
+    line-height: 1.25;
+  }
+
+  .heroLeft p {
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .heroButtons .btn {
+    width: 100%;
+  }
+
+  .bigBtn {
+    padding: 13px 20px;
+    font-size: 15px;
+  }
+
+  .heroCard {
+    padding: 24px 20px;
+    max-width: 100%;
+  }
+
+  .heroCard h3 {
+    font-size: 22px;
+  }
+
+  .features h2,
+  .aboutContent h2,
+  .contact h2 {
+    font-size: 28px;
   }
 
   .featuresGrid {
     grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .featureCard {
+    padding: 22px 18px;
+  }
+
+  .aboutContent p,
+  .contact p {
+    font-size: 16px;
+    line-height: 1.7;
+  }
+}
+
+/* small mobile */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 14px 14px;
+  }
+
+  .navLinks {
+    gap: 12px;
+  }
+
+  .navLinks a {
+    font-size: 13px;
+  }
+
+  .authButtons {
+    flex-direction: column;
+  }
+
+  .authButtons .btn {
+    width: 100%;
+  }
+
+  .hero,
+  .features,
+  .about,
+  .contact {
+    padding: 36px 14px;
+  }
+
+  .heroLeft h1 {
+    font-size: 28px;
+  }
+
+  .heroLeft p {
+    font-size: 15px;
+  }
+
+  .heroCard {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .heroCard h3 {
+    font-size: 20px;
+  }
+
+  .features h2,
+  .aboutContent h2,
+  .contact h2 {
+    font-size: 24px;
+  }
+
+  .featureCard h3 {
+    font-size: 18px;
+  }
+
+  .featureCard p,
+  .aboutContent p,
+  .contact p {
+    font-size: 15px;
+  }
+
+  .btn,
+  .bigBtn {
+    font-size: 14px;
   }
 }
