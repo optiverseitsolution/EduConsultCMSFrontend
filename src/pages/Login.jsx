@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Eye, GraduationCap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import { loginUser } from "../api/authService";
 
 const Login = () => {
@@ -109,8 +109,10 @@ const Login = () => {
         <div className="text-center mt-6 pt-6 border-t border-gray-700">
           <p className="text-sm opacity-70">
             Don't have an account?{" "}
-            <a href="/register" className="text-blue-600 font-semibold">
-              Register
+            <a >
+          <Link to="/register" className="text-blue-600 font-semibold">
+            Register
+          </Link>
             </a>
           </p>
         </div>

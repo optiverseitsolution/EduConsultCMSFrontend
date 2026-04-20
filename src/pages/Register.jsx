@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Eye, GraduationCap } from "lucide-react";
 import { registerUser } from "../api/authService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 
 const Register = () => {
   const [data, setData] = useState({
@@ -44,7 +44,7 @@ const Register = () => {
       return setFormError("All fields are required.");
     }
 
-    if (data.password.length <= 8) {
+    if (data.password.length <= 7) {
       return setFormError("Password must be at least 8 characters.");
     }
 
@@ -209,12 +209,9 @@ const Register = () => {
         <div className="text-center w-full mt-6 pt-6 border-t border-gray-700">
           <p className="text-sm opacity-70">
             Already have an account?{" "}
-            <a
-              href="/login"
-              className="text-blue-600 font-semibold hover:underline"
-            >
+            <Link to="/login" className="text-blue-600 font-semibold hover:underline">
               Sign in
-            </a>
+            </Link>
           </p>
         </div>
       </div>
