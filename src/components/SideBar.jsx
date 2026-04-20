@@ -70,7 +70,7 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+    { id: "dashboard", label: "Dashboard", path: "dashboard", icon: LayoutDashboard },
     { id: "users-roles", label: "Users & Roles", path: "userrole", icon: Shield },
     { id: "students", label: "Students", path: "student", icon: GraduationCap },
     { id: "courses", label: "Courses", path: "courses", icon: BookOpen },
