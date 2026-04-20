@@ -1,4 +1,3 @@
-// import { useState } from 'react'
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard.jsx";
 import Counselors from "./pages/Counsulers.jsx";
@@ -13,18 +12,18 @@ import Packages from "./pages/Packages.jsx";
 import TourServices from "./pages/TourServices.jsx";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
 
 function App() {
   return (
     <Routes>
-      {/* Authentication - Index Route */}
-      <Route index element={<Login />} />
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
- 
-      <Route path="login" element={<Login />} />
-      {/* Layout Route */}
 
-      <Route path="dashboard" element={<Dashboard />}>
+      {/* Dashboard Routes */}
+      <Route path="/dashboard" element={<Dashboard />}>
         <Route path="userrole" element={<UsersRoles />} />
         <Route path="student" element={<Students />} />
         <Route path="courses" element={<Courses />} />
